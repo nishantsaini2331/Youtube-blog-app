@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../utils/userSilce";
 
@@ -13,6 +13,7 @@ function AuthForm({ type }) {
     });
 
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     async function handleAuthForm(e) {
         e.preventDefault();
@@ -33,7 +34,6 @@ function AuthForm({ type }) {
                 userData
             );
 
-            console.log(res);
 
             dispatch(login(res.data.user))
 
@@ -41,6 +41,7 @@ function AuthForm({ type }) {
             // localStorage.setItem("token", JSON.stringify(res.data.token));
 
             toast.success(res.data.message);
+            navigate("/")
         } catch (error) {
             toast.error(error.response.data.message);
         }

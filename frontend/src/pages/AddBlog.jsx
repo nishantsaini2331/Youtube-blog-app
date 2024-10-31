@@ -79,7 +79,7 @@ function AddBlog() {
     // } catch (error) {
     //   toast.error(error.response.data.message);
     // }
-    
+
     setBlogData({
       title: title,
       description: description,
@@ -96,7 +96,7 @@ function AddBlog() {
   return token == null ? (
     <Navigate to={"/signin"} />
   ) : (
-    <div className="w-[500px]">
+    <div className="w-[500px] mx-auto">
       <label htmlFor="">Title</label>
       <input
         type="text"

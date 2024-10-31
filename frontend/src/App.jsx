@@ -8,7 +8,7 @@ import BlogPage from "./pages/BlogPage";
 function App() {
   
     return (
-        <div className="bg-slate-200 w-screen h-screen ">
+        // <div className=" w-screen h-screen ">
             <Routes>
                 <Route path="/" element={<Navbar />}>
                     <Route
@@ -37,7 +37,7 @@ function App() {
                     ></Route>
                 </Route>
             </Routes>
-        </div>
+        // </div>
     );
 }
 

@@ -8,6 +8,8 @@ import {
   changeLikes,
   removeSelectedBlog,
 } from "../utils/selectedBlogSlice";
+import Comment from "../components/Comment";
+import { setIsOpen } from "../utils/commentSlice";
 // import jwt from "jsonwebtoken"
 
 function BlogPage() {
@@ -18,8 +20,9 @@ function BlogPage() {
   //   const user = JSON.parse(localStorage.getItem("user"));
   //   const token = JSON.parse(localStorage.getItem("token"));
 
-  const { token, email, id: userId } = useSelector((slice) => slice.user);
-  const { likes } = useSelector((slice) => slice.selectedBlog);
+  const { token, email, id: userId } = useSelector((state) => state.user);
+  const { likes  ,comments } = useSelector((state) => state.selectedBlog);
+  const { isOpen } = useSelector((state) => state.comment);
   //   console.log(token);
 
   //   console.log();
@@ -69,9 +72,9 @@ function BlogPage() {
     fetchBlogById();
 
     return () => {
-    //   console.log(window.location.pathname); // currnt path
-    //   console.log(location.pathname); //previous path
-
+      //   console.log(window.location.pathname); // currnt path
+      //   console.log(location.pathname); //previous path
+      dispatch(setIsOpen(false))
       if (window.location.pathname !== `/edit/${id}`) {
         dispatch(removeSelectedBlog());
       }
@@ -79,10 +82,12 @@ function BlogPage() {
   }, [id]);
 
   return (
-    <div className="max-w-[700px]">
+    <div className="max-w-[700px] mx-auto ">
       {blogData ? (
         <div>
-          <h1 className="mt-10 font-bold text-6xl">{blogData.title}</h1>
+          <h1 className="mt-10 font-bold text-6xl capitalize">
+            {blogData.title}
+          </h1>
           <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
           <img src={blogData.image} alt="" />
 
@@ -110,14 +115,16 @@ function BlogPage() {
             </div>
 
             <div className="flex gap-2">
-              <i className="fi fi-sr-comment-alt text-3xl mt-1"></i>
-              <p className="text-2xl">{blogData.comments.length}</p>
+              <i onClick={() => dispatch(setIsOpen())} className="fi fi-sr-comment-alt text-3xl mt-1"></i>
+              <p className="text-2xl">{comments.length}</p>
             </div>
           </div>
         </div>
       ) : (
         <h1>Loading....</h1>
       )}
+
+      {isOpen && <Comment />}
     </div>
   );
 }
