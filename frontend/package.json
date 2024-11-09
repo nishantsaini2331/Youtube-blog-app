@@ -10,6 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.30.6",
+    "@editorjs/embed": "^2.7.6",
+    "@editorjs/header": "^2.8.8",
+    "@editorjs/image": "^2.10.0",
+    "@editorjs/list": "^1.10.0",
+    "@editorjs/marker": "^1.4.0",
+    "@editorjs/nested-list": "^1.4.3",
+    "@editorjs/raw": "^2.5.0",
+    "@editorjs/text-variant-tune": "^1.0.3",
+    "@editorjs/underline": "^1.2.1",
     "@flaticon/flaticon-uicons": "^3.3.1",
     "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.7",

@@ -17,8 +17,9 @@ async function createBlog(req, res) {
     const creator = req.user;
 
     const { title, description, draft } = req.body;
-    const image = req.file;
-    console.log({ title, description });
+    const { image, images } = req.files;
+
+    const content = JSON.parse(req.body.content);
 
     if (!title) {
       return res.status(400).json({
@@ -32,15 +33,37 @@ async function createBlog(req, res) {
       });
     }
 
-    console.log(creator);
-
-    const findUser = await User.findById(creator);
+    if (!content) {
+      return res.status(400).json({
+        message: "Please add some content",
+      });
+    }
 
     //cloudinary wali prikriya shuru karo
 
-    const { secure_url, public_id } = await uploadImage(image.path);
+    let imageIndex = 0;
 
-    fs.unlinkSync(image.path);
+    for (let i = 0; i < content.blocks.length; i++) {
+      const block = content.blocks[i];
+      if (block.type === "image") {
+        const { secure_url, public_id } = await uploadImage(
+          `data:image/jpeg;base64,${images[imageIndex].buffer.toString(
+            "base64"
+          )}`
+        );
+
+        block.data.file = {
+          url: secure_url,
+          imageId: public_id,
+        };
+
+        imageIndex++;
+      }
+    }
+
+    const { secure_url, public_id } = await uploadImage(
+      `data:image/jpeg;base64,${image[0].buffer.toString("base64")}`
+    );
 
     const blogId =
       title.toLowerCase().split(" ").join("-") + "-" + randomUUID();
@@ -54,6 +77,7 @@ async function createBlog(req, res) {
       image: secure_url,
       imageId: public_id,
       blogId,
+      content,
     });
 
     await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
@@ -243,14 +267,14 @@ async function likeBlog(req, res) {
       return res.status(200).json({
         success: true,
         message: "Blog Liked successfully",
-        isLiked : true
+        isLiked: true,
       });
     } else {
       await Blog.findByIdAndUpdate(id, { $pull: { likes: creator } });
       return res.status(200).json({
         success: true,
         message: "Blog DisLiked successfully",
-        isLiked : false
+        isLiked: false,
       });
     }
   } catch (error) {

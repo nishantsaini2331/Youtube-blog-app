@@ -1,11 +1,27 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
+import List from "@editorjs/list";
+import NestedList from "@editorjs/nested-list";
+import CodeTool from "@editorjs/code";
+import Marker from "@editorjs/marker";
+import Underline from "@editorjs/underline";
+import Embed from "@editorjs/embed";
+import RawTool from "@editorjs/raw";
+import ImageTool from "@editorjs/image";
+import TextVariantTune from "@editorjs/text-variant-tune";
+
 function AddBlog() {
   const { id } = useParams();
+  const editorjsRef = useRef(null);
+
+  const formData = new FormData();
+
   const { token } = useSelector((silce) => silce.user);
   const { title, description, image } = useSelector(
     (slice) => slice.selectedBlog
@@ -15,8 +31,8 @@ function AddBlog() {
     title: "",
     description: "",
     image: null,
+    content: "",
   });
-  //   console.log(typeof(blogData.image));
 
   const navigate = useNavigate();
 
@@ -27,10 +43,23 @@ function AddBlog() {
   // }, []);
 
   async function handlePostBlog() {
+    
+
+    formData.append("title", blogData.title);
+    formData.append("description", blogData.description);
+    formData.append("image", blogData.image);
+    formData.append("content", JSON.stringify(blogData.content));
+
+    blogData.content.blocks.forEach((block) => {
+      if (block.type === "image") {
+        formData.append("images", block.data.file.image);
+      }
+    });
+
     try {
       const res = await axios.post(
         "http://localhost:3000/api/v1/blogs",
-        blogData,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -38,8 +67,6 @@ function AddBlog() {
           },
         }
       );
-      console.log(URL.createObjectURL(blogData.image));
-
       toast.success(res.data.message);
       navigate("/");
     } catch (error) {
@@ -87,11 +114,73 @@ function AddBlog() {
     });
   }
 
+  function initializeEditorjs() {
+    editorjsRef.current = new EditorJS({
+      holder: "editorjs",
+      placeholder: "write something...",
+      tools: {
+        header: {
+          class: Header,
+          inlineToolbar: true,
+          config: {
+            placeholder: "Enter a header",
+            levels: [2, 3, 4],
+            defaultLevel: 3,
+          },
+        },
+        List: {
+          class: NestedList,
+          config: {},
+          inlineToolbar: true,
+        },
+        code: CodeTool,
+        Marker: Marker,
+        Underline: Underline,
+        Embed: Embed,
+        raw: RawTool,
+        textVariant: TextVariantTune,
+        image: {
+          class: ImageTool,
+          config: {
+            uploader: {
+              uploadByFile: async (image) => {
+                // console.log(image);
+                return {
+                  success: 1,
+
+                  file: {
+                    url: URL.createObjectURL(image),
+                    image,
+                  },
+                };
+              },
+            },
+          },
+        },
+      },
+      tunes: ["textVariant"],
+      onChange: async () => {
+        let data = await editorjsRef.current.save();
+        setBlogData((blogData) => ({ ...blogData, content: data }));
+      },
+    });
+  }
+
   useEffect(() => {
     if (id) {
       fetchBlogById();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (editorjsRef.current === null) {
+      initializeEditorjs();
+    }
+
+    return () => {
+      editorjsRef.current = null;
+    };
+  }, []);
 
   return token == null ? (
     <Navigate to={"/signin"} />
@@ -156,6 +245,9 @@ function AddBlog() {
       </div>
 
       <br />
+
+      <div id="editorjs"></div>
+
       <button onClick={id ? handleUpdateBlog : handlePostBlog}>
         {id ? "Update blog" : "Post blog"}
       </button>

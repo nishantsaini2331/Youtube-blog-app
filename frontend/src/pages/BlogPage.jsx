@@ -21,7 +21,9 @@ function BlogPage() {
   //   const token = JSON.parse(localStorage.getItem("token"));
 
   const { token, email, id: userId } = useSelector((state) => state.user);
-  const { likes  ,comments } = useSelector((state) => state.selectedBlog);
+  const { likes, comments, content } = useSelector(
+    (state) => state.selectedBlog
+  );
   const { isOpen } = useSelector((state) => state.comment);
   //   console.log(token);
 
@@ -38,11 +40,13 @@ function BlogPage() {
         data: { blog },
       } = await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
       setBlogData(blog);
+      
+      dispatch(addSlectedBlog(blog));
+
       if (blog.likes.includes(userId)) {
         setIsLike((prev) => !prev);
       }
 
-      dispatch(addSlectedBlog(blog));
     } catch (error) {
       toast.error(error);
     }
@@ -69,16 +73,19 @@ function BlogPage() {
   }
 
   useEffect(() => {
+
+
     fetchBlogById();
 
     return () => {
       //   console.log(window.location.pathname); // currnt path
       //   console.log(location.pathname); //previous path
-      dispatch(setIsOpen(false))
-      if (window.location.pathname !== `/edit/${id}`) {
+      dispatch(setIsOpen(false));
+      if (window.location.pathname !== `/edit/${id}` && window.location.pathname !== `/blog/${id}`) {
         dispatch(removeSelectedBlog());
       }
     };
+    
   }, [id]);
 
   return (
@@ -115,9 +122,51 @@ function BlogPage() {
             </div>
 
             <div className="flex gap-2">
-              <i onClick={() => dispatch(setIsOpen())} className="fi fi-sr-comment-alt text-3xl mt-1"></i>
+              <i
+                onClick={() => dispatch(setIsOpen())}
+                className="fi fi-sr-comment-alt text-3xl mt-1"
+              ></i>
               <p className="text-2xl">{comments.length}</p>
             </div>
+          </div>
+
+          <div className="my-10">
+            {content.blocks.map((block) => {
+              if (block.type == "header") {
+                if (block.data.level == 2) {
+                  return (
+                    <h2 className="font-bold text-4xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h2>
+                  );
+                } else if (block.data.level == 3) {
+                  return (
+                    <h3 className="font-bold text-3xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h3>
+                  );
+                } else if (block.data.level == 4) {
+                  return (
+                    <h4  className="font-bold text-2xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h4>
+                  );
+                }
+              } else if (block.type == "paragraph") {
+                return (
+                  <p className="my-4" dangerouslySetInnerHTML={{ __html: block.data.text }}></p>
+                );
+              }
+              else if (block.type == "image") {
+                return (
+                  <div className="my-4">
+                    <img src={block.data.file.url} alt="" />
+                    <p className="text-center my-2">{block.data.caption}</p>
+                  </div>
+                );
+              }
+
+            })}
           </div>
         </div>
       ) : (
