@@ -23,7 +23,7 @@ function AddBlog() {
   const formData = new FormData();
 
   const { token } = useSelector((silce) => silce.user);
-  const { title, description, image } = useSelector(
+  const { title, description, image, content } = useSelector(
     (slice) => slice.selectedBlog
   );
 
@@ -43,8 +43,6 @@ function AddBlog() {
   // }, []);
 
   async function handlePostBlog() {
-    
-
     formData.append("title", blogData.title);
     formData.append("description", blogData.description);
     formData.append("image", blogData.image);
@@ -75,10 +73,41 @@ function AddBlog() {
   }
 
   async function handleUpdateBlog() {
+    // console.log(blogData);
+
+    let formData = new FormData();
+
+    formData.append("title", blogData.title);
+    formData.append("description", blogData.description);
+    formData.append("image", blogData.image);
+
+    formData.append("content", JSON.stringify(blogData.content));
+
+    let existingImages = [];
+
+    blogData.content.blocks.forEach((block) => {
+      if (block.type === "image") {
+        if (block.data.file.image) {
+          formData.append("images", block.data.file.image);
+        } else {
+          existingImages.push({
+            url: block.data.file.url,
+            imageId: block.data.file.imageId,
+          });
+        }
+      }
+    });
+
+    // for (let data of formData.entries()) {
+    //   console.log(data);
+    // }
+
+    formData.append("existingImages", JSON.stringify(existingImages));
+
     try {
       const res = await axios.patch(
         "http://localhost:3000/api/v1/blogs/" + id,
-        blogData,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -111,6 +140,7 @@ function AddBlog() {
       title: title,
       description: description,
       image: image,
+      content: content,
     });
   }
 
@@ -118,6 +148,7 @@ function AddBlog() {
     editorjsRef.current = new EditorJS({
       holder: "editorjs",
       placeholder: "write something...",
+      data: content,
       tools: {
         header: {
           class: Header,
@@ -177,9 +208,9 @@ function AddBlog() {
       initializeEditorjs();
     }
 
-    return () => {
-      editorjsRef.current = null;
-    };
+    // return () => {
+    //   editorjsRef.current = null;
+    // };
   }, []);
 
   return token == null ? (

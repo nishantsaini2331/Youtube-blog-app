@@ -151,17 +151,13 @@ async function getBlog(req, res) {
 async function updateBlog(req, res) {
   try {
     const creator = req.user;
-    // console.log(creator);
+
     const { id } = req.params;
 
     const { title, description, draft } = req.body;
 
-    const image = req.file;
-
-    // const user = await User.findById(creator).select("-password");
-    // console.log(user);
-
-    // console.log(user.blogs.find((blogId) => blogId === id));
+    const content = JSON.parse(req.body.content);
+    const existingImages = JSON.parse(req.body.existingImages);
 
     const blog = await Blog.findOne({ blogId: id });
 
@@ -177,26 +173,65 @@ async function updateBlog(req, res) {
       });
     }
 
+    // console.log(blog);
+
+    let imagesToDelete = blog.content.blocks
+      .filter((block) => block.type == "image")
+      .filter(
+        (block) => !existingImages.find(({ url }) => url == block.data.file.url)
+      )
+      .map((block) => block.data.file.imageId);
+
+    // if (imagesToDelete.length > 0) {
+    //   await Promise.all(
+    //     imagesToDelete.map((id) => deleteImagefromCloudinary(id))
+    //   );
+    // }
+
+    if (req.files.images) {
+      let imageIndex = 0;
+
+      for (let i = 0; i < content.blocks.length; i++) {
+        const block = content.blocks[i];
+        if (block.type === "image" && block.data.file.image) {
+          const { secure_url, public_id } = await uploadImage(
+            `data:image/jpeg;base64,${req.files.images[
+              imageIndex
+            ].buffer.toString("base64")}`
+          );
+
+          block.data.file = {
+            url: secure_url,
+            imageId: public_id,
+          };
+
+          imageIndex++;
+        }
+      }
+    }
+
     // const updatedBlog = await Blog.updateOne(
-    //     { _id: id },
-    //     {
-    //         title,
-    //         description,
-    //         draft,
-    //     },
+    //   { _id: id },
+    //   {
+    //     title,
+    //     description,
+    //     draft,
+    //   }
     // );
 
-    if (image) {
+    if (req?.files?.image) {
       await deleteImagefromCloudinary(blog.imageId);
-      const { secure_url, public_id } = await uploadImage(image.path);
+      const { secure_url, public_id } = await uploadImage(
+        `data:image/jpeg;base64,${req?.files?.image[0]?.buffer?.toString("base64")}`
+      );
       blog.image = secure_url;
       blog.imageId = public_id;
-      fs.unlinkSync(image.path);
     }
 
     blog.title = title || blog.title;
     blog.description = description || blog.description;
     blog.draft = draft || blog.draft;
+    blog.content = content || blog.content;
 
     await blog.save();
 
@@ -206,6 +241,7 @@ async function updateBlog(req, res) {
       blog,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: error.message,
     });

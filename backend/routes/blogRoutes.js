@@ -31,12 +31,19 @@ const route = express.Router();
 route.post(
   "/blogs",
   verifyUser,
-    upload.fields([{ name: "image", maxCount  : 1 }, { name: "images" }]),
+  upload.fields([{ name: "image", maxCount: 1 }, { name: "images" }]),
   createBlog
 );
 route.get("/blogs", getBlogs);
+
 route.get("/blogs/:blogId", getBlog);
-route.patch("/blogs/:id", verifyUser, upload.single("image"), updateBlog);
+
+route.patch(
+  "/blogs/:id",
+  verifyUser,
+  upload.fields([{ name: "image", maxCount: 1 }, { name: "images" }]),
+  updateBlog
+);
 route.delete("/blogs/:id", verifyUser, deleteBlog);
 
 //like
