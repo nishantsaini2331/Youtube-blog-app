@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import EditorJS from "@editorjs/editorjs";
@@ -15,6 +15,8 @@ import Embed from "@editorjs/embed";
 import RawTool from "@editorjs/raw";
 import ImageTool from "@editorjs/image";
 import TextVariantTune from "@editorjs/text-variant-tune";
+import { setIsOpen } from "../utils/commentSlice";
+import { removeSelectedBlog } from "../utils/selectedBlogSlice";
 
 function AddBlog() {
   const { id } = useParams();
@@ -35,6 +37,7 @@ function AddBlog() {
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // useEffect(() => {
   //     if (!token) {
@@ -209,41 +212,59 @@ function AddBlog() {
     }
 
     // return () => {
-    //   editorjsRef.current = null;
+
     // };
+    return () => {
+      //   console.log(window.location.pathname); // currnt path
+      //   console.log(location.pathname); //previous path
+      editorjsRef.current = null;
+      dispatch(setIsOpen(false));
+      if (
+        window.location.pathname !== `/edit/${id}` &&
+        window.location.pathname !== `/blog/${id}`
+      ) {
+        dispatch(removeSelectedBlog());
+      }
+    };
   }, []);
 
   return token == null ? (
     <Navigate to={"/signin"} />
   ) : (
     <div className="w-[500px] mx-auto">
-      <label htmlFor="">Title</label>
-      <input
-        type="text"
-        placeholder="title"
-        onChange={(e) =>
-          setBlogData((blogData) => ({
-            ...blogData,
-            title: e.target.value,
-          }))
-        }
-        value={blogData.title}
-      />
-      <br />
-      <label htmlFor="">Description</label>
-      <input
-        type="text"
-        placeholder="description"
-        onChange={(e) =>
-          setBlogData((blogData) => ({
-            ...blogData,
-            description: e.target.value,
-          }))
-        }
-        value={blogData.description}
-      />
-      <br />
+      <div className="my-4">
+        <h2 className="text-2xl font-semibold my-2">Title</h2>
+        <input
+          type="text"
+          placeholder="title"
+          onChange={(e) =>
+            setBlogData((blogData) => ({
+              ...blogData,
+              title: e.target.value,
+            }))
+          }
+          value={blogData.title}
+          className="border focus:outline-none rounded-lg w-full p-2 placeholder:text-lg"
+        />
+      </div>
+
+      <div className="my-4">
+        <h2 className="text-2xl font-semibold my-2">Description</h2>
+        <textarea
+          type="text"
+          placeholder="description"
+          className=" h-[100px] resize-none w-full p-3 rounded-lg border text-lg focus:outline-none"
+          onChange={(e) =>
+            setBlogData((blogData) => ({
+              ...blogData,
+              description: e.target.value,
+            }))
+          }
+        />
+      </div>
+
       <div>
+        <h2 className="text-2xl font-semibold my-2">Image</h2>
         <label htmlFor="image" className=" ">
           {blogData.image ? (
             <img
@@ -253,10 +274,10 @@ function AddBlog() {
                   : URL.createObjectURL(blogData.image)
               }
               alt=""
-              className="aspect-video object-cover"
+              className="aspect-video object-cover border rounded-lg"
             />
           ) : (
-            <div className=" bg-slate-500 aspect-video flex justify-center items-center text-4xl">
+            <div className=" bg-white border rounded-lg aspect-video opacity-50 flex justify-center items-center text-4xl">
               Select Image
             </div>
           )}
@@ -275,11 +296,15 @@ function AddBlog() {
         />
       </div>
 
-      <br />
+      <div className="my-4">
+        <h2 className="text-2xl font-semibold my-2">Content</h2>
+        <div id="editorjs" className="w-full"></div>
+      </div>
 
-      <div id="editorjs"></div>
-
-      <button onClick={id ? handleUpdateBlog : handlePostBlog}>
+      <button
+        className="bg-blue-500 text-lg py-4 px-7 rounded-full  font-semibold text-white my-6 "
+        onClick={id ? handleUpdateBlog : handlePostBlog}
+      >
         {id ? "Update blog" : "Post blog"}
       </button>
     </div>
