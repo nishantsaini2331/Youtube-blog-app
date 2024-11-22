@@ -16,6 +16,7 @@ const {
   deleteComment,
   editComment,
   likeComment,
+  addNestedComment,
 } = require("../controllers/commentController");
 const upload = require("../utils/multer");
 
@@ -54,5 +55,8 @@ route.post("/blogs/comment/:id", verifyUser, addComment);
 route.delete("/blogs/comment/:id", verifyUser, deleteComment);
 route.patch("/blogs/edit-comment/:id", verifyUser, editComment);
 route.patch("/blogs/like-comment/:id", verifyUser, likeComment);
+
+// for nested comment
+route.post("/comment/:parentCommentId/:id", verifyUser, addNestedComment);
 
 module.exports = route;

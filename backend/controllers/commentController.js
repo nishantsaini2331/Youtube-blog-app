@@ -27,8 +27,7 @@ async function addComment(req, res) {
       comment,
       blog: id,
       user: creator,
-    })
-    .then((comment) => {
+    }).then((comment) => {
       return comment.populate({
         path: "user",
         select: "name email",
@@ -60,7 +59,6 @@ async function deleteComment(req, res) {
       path: "blog",
       select: "creator",
     });
-    console.log(comment, userId, comment.blog.creator, comment.user);
 
     if (!comment) {
       return res.status(500).json({
@@ -77,15 +75,20 @@ async function deleteComment(req, res) {
       });
     }
 
+    await Comment.deleteMany({ _id: { $in: comment.replies } });
+
     await Blog.findByIdAndUpdate(comment.blog._id, {
-      $pull: { comments: id },
+      $pull: { comments : id },
     });
+
+
     await Comment.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
       message: "Comment deleted successfully",
     });
+    
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -160,9 +163,56 @@ async function likeComment(req, res) {
   }
 }
 
+async function addNestedComment(req, res) {
+  try {
+    const userId = req.user;
+
+    const { id: blogId, parentCommentId } = req.params;
+
+    const { reply } = req.body;
+
+    const comment = await Comment.findById(parentCommentId);
+
+    const blog = await Blog.findById(blogId);
+
+    if (!comment) {
+      return res.status(500).json({
+        message: "parent comment is not found",
+      });
+    }
+
+    if (!blog) {
+      return res.status(500).json({
+        message: "Blog is not found",
+      });
+    }
+
+    const newReply = await Comment.create({
+      blog: blogId,
+      comment: reply,
+      parentComment: parentCommentId,
+      user: userId,
+    });
+
+    await Comment.findByIdAndUpdate(parentCommentId, {
+      $push: { replies: newReply._id },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Reply added successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   addComment,
   deleteComment,
   editComment,
   likeComment,
+  addNestedComment,
 };

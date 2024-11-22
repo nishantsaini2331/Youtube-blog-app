@@ -50,9 +50,9 @@ function Comment() {
         }
       );
 
-      toast.success(res.data.message)
+      toast.success(res.data.message);
       console.log(res.data);
-      dispatch(setCommentLikes({commentId , userId}))
+      dispatch(setCommentLikes({ commentId, userId }));
     } catch (error) {
       console.log(error);
     }
@@ -106,19 +106,28 @@ function Comment() {
 
               <p className="font-medium text-lg">{comment.comment}</p>
 
-              <div className="cursor-pointer flex gap-2 ">
-                {comment.likes.includes(userId) ? (
-                  <i
-                    onClick={() => handleCommentLike(comment._id)}
-                    className="fi fi-sr-thumbs-up text-blue-600 text-xl mt-1"
-                  ></i>
-                ) : (
-                  <i
-                    onClick={() => handleCommentLike(comment._id)}
-                    className="fi fi-rr-social-network text-xl mt-1"
-                  ></i>
-                )}
-                <p className="text-xl">{comment.likes.length}</p>
+              <div className="flex justify-between">
+                <div className="flex gap-4">
+                  <div className="cursor-pointer flex gap-2 ">
+                    {comment.likes.includes(userId) ? (
+                      <i
+                        onClick={() => handleCommentLike(comment._id)}
+                        className="fi fi-sr-thumbs-up text-blue-600 text-xl mt-1"
+                      ></i>
+                    ) : (
+                      <i
+                        onClick={() => handleCommentLike(comment._id)}
+                        className="fi fi-rr-social-network text-lg mt-1"
+                      ></i>
+                    )}
+                    <p className="text-lg">{comment.likes.length}</p>
+                  </div>
+                  <div className="flex gap-2 cursor-pointer">
+                    <i className="fi fi-sr-comment-alt text-lg mt-1"></i>
+                    <p className="text-lg">5</p>
+                  </div>
+                </div>
+                <p className="text-lg hover:underline cursor-pointer">reply</p>
               </div>
             </div>
           </>
