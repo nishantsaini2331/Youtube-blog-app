@@ -130,7 +130,31 @@ async function getBlog(req, res) {
       .populate({
         path: "creator",
         select: "name email",
-      });
+      })
+      .lean();
+
+    async function populateReplies(comments) {
+      for (const comment of comments) {
+        let populatedComment = await Comment.findById(comment._id)
+          .populate({
+            path: "replies",
+            populate: {
+              path: "user",
+              select: "name email",
+            },
+          })
+          .lean();
+
+        comment.replies = populatedComment.replies;
+
+        if (comment.replies && comment.replies.length > 0) {
+          await populateReplies(comment.replies);
+        }
+      }
+      return comments;
+    }
+
+    blog.comments = await populateReplies(blog.comments);
 
     if (!blog) {
       return res.status(404).json({
@@ -222,7 +246,9 @@ async function updateBlog(req, res) {
     if (req?.files?.image) {
       await deleteImagefromCloudinary(blog.imageId);
       const { secure_url, public_id } = await uploadImage(
-        `data:image/jpeg;base64,${req?.files?.image[0]?.buffer?.toString("base64")}`
+        `data:image/jpeg;base64,${req?.files?.image[0]?.buffer?.toString(
+          "base64"
+        )}`
       );
       blog.image = secure_url;
       blog.imageId = public_id;

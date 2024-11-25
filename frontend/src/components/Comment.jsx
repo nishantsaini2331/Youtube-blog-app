@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsOpen } from "../utils/commentSlice";
 import { useState } from "react";
 import axios from "axios";
-import { combineReducers } from "@reduxjs/toolkit";
 import { setCommentLikes, setComments } from "../utils/selectedBlogSlice";
 
 import { formatDate } from "../utils/formatDate";
@@ -11,6 +10,7 @@ import toast from "react-hot-toast";
 function Comment() {
   const dispatch = useDispatch();
   const [comment, setComment] = useState("");
+  const [activeReply, setActiveReply] = useState(null);
   console.log(comment);
   const { _id: blogId, comments } = useSelector((state) => state.selectedBlog);
   const { token, id: userId } = useSelector((state) => state.user);
@@ -33,26 +33,6 @@ function Comment() {
 
       dispatch(setComments(res.data.newComment));
       setComment("");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function handleCommentLike(commentId) {
-    try {
-      const res = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/blogs/like-comment/${commentId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success(res.data.message);
-      console.log(res.data);
-      dispatch(setCommentLikes({ commentId, userId }));
     } catch (error) {
       console.log(error);
     }
@@ -81,59 +61,165 @@ function Comment() {
       </div>
 
       <div className="mt-4">
-        {comments.map((comment) => (
-          <>
-            <hr className="my-2" />
-            <div className="flex flex-col gap-2 my-4">
-              <div className="flex w-full justify-between">
-                <div className="flex gap-2">
-                  <div className="w-10 h-10">
-                    <img
-                      src={`https://api.dicebear.com/9.x/initials/svg?seed=${comment.user.name}`}
-                      alt=""
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div>
-                    <p className="capitalize font-medium">
-                      {comment.user.name}
-                    </p>
-                    <p>{formatDate(comment.createdAt)}</p>
-                  </div>
-                </div>
-                <i className="fi fi-bs-menu-dots"></i>
-              </div>
-
-              <p className="font-medium text-lg">{comment.comment}</p>
-
-              <div className="flex justify-between">
-                <div className="flex gap-4">
-                  <div className="cursor-pointer flex gap-2 ">
-                    {comment.likes.includes(userId) ? (
-                      <i
-                        onClick={() => handleCommentLike(comment._id)}
-                        className="fi fi-sr-thumbs-up text-blue-600 text-xl mt-1"
-                      ></i>
-                    ) : (
-                      <i
-                        onClick={() => handleCommentLike(comment._id)}
-                        className="fi fi-rr-social-network text-lg mt-1"
-                      ></i>
-                    )}
-                    <p className="text-lg">{comment.likes.length}</p>
-                  </div>
-                  <div className="flex gap-2 cursor-pointer">
-                    <i className="fi fi-sr-comment-alt text-lg mt-1"></i>
-                    <p className="text-lg">5</p>
-                  </div>
-                </div>
-                <p className="text-lg hover:underline cursor-pointer">reply</p>
-              </div>
-            </div>
-          </>
-        ))}
+        <DisplayComments
+          comments={comments}
+          userId={userId}
+          blogId={blogId}
+          token={token}
+          activeReply={activeReply}
+          setActiveReply={setActiveReply}
+        />
       </div>
     </div>
+  );
+}
+
+function DisplayComments({
+  comments,
+  userId,
+  blogId,
+  token,
+  setActiveReply,
+  activeReply,
+}) {
+  const [reply, setReply] = useState("");
+
+  async function handleReply(parentCommentId) {
+    try {
+      let res = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/comment/${parentCommentId}/${blogId}`,
+        {
+          reply,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log(res.data);
+
+      //   dispatch(setComments(res.data.newComment));
+      //   setComment("");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleCommentLike(commentId) {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/blogs/like-comment/${commentId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success(res.data.message);
+      console.log(res.data);
+      dispatch(setCommentLikes({ commentId, userId }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleActiveReply(id) {
+    setActiveReply((prev) => (prev === id ? null : id));
+  }
+
+  return (
+    <>
+      {comments.map((comment) => (
+        <>
+          <hr className="my-2" />
+          <div className="flex flex-col gap-2 my-4">
+            <div className="flex w-full justify-between">
+              <div className="flex gap-2">
+                <div className="w-10 h-10">
+                  <img
+                    src={`https://api.dicebear.com/9.x/initials/svg?seed=${comment.user.name}`}
+                    alt=""
+                    className="rounded-full"
+                  />
+                </div>
+                <div>
+                  <p className="capitalize font-medium">{comment.user.name}</p>
+                  <p>{formatDate(comment.createdAt)}</p>
+                </div>
+              </div>
+              <i className="fi fi-bs-menu-dots"></i>
+            </div>
+
+            <p className="font-medium text-lg">{comment.comment}</p>
+
+            <div className="flex justify-between">
+              <div className="flex gap-4">
+                <div className="cursor-pointer flex gap-2 ">
+                  {comment.likes.includes(userId) ? (
+                    <i
+                      onClick={() => handleCommentLike(comment._id)}
+                      className="fi fi-sr-thumbs-up text-blue-600 text-xl mt-1"
+                    ></i>
+                  ) : (
+                    <i
+                      onClick={() => handleCommentLike(comment._id)}
+                      className="fi fi-rr-social-network text-lg mt-1"
+                    ></i>
+                  )}
+                  <p className="text-lg">{comment.likes.length}</p>
+                </div>
+                <div className="flex gap-2 cursor-pointer">
+                  <i className="fi fi-sr-comment-alt text-lg mt-1"></i>
+                  <p className="text-lg">{comment.replies.length}</p>
+                </div>
+              </div>
+              <p
+                onClick={() => handleActiveReply(comment._id)}
+                className="text-lg hover:underline cursor-pointer"
+              >
+                reply
+              </p>
+            </div>
+
+            {activeReply === comment._id && (
+              <div className="my-4">
+                <textarea
+                  type="text"
+                  placeholder="Reply..."
+                  className=" h-[150px] resize-none drop-shadow w-full p-3 text-lg focus:outline-none"
+                  onChange={(e) => setReply(e.target.value)}
+                />
+                <button
+                  onClick={() => handleReply(comment._id)}
+                  className="bg-green-500 px-7 py-3 my-2"
+                >
+                  Add
+                </button>
+              </div>
+            )}
+
+            {comment.replies.length > 0 && (
+              <div className="pl-6 border-l ">
+                <DisplayComments
+                  comments={comment.replies}
+                  userId={userId}
+                  blogId={blogId}
+                  token={token}
+                  activeReply={activeReply}
+                  setActiveReply={setActiveReply}
+                />
+              </div>
+            )}
+          </div>
+        </>
+      ))}
+    </>
   );
 }
 
