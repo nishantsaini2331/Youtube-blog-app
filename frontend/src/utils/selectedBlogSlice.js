@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 const selectedBlogSlice = createSlice({
   name: "selectedBlogSlice",
@@ -40,6 +40,53 @@ const selectedBlogSlice = createSlice({
 
       return state;
     },
+    setReplies(state, action) {
+      let newReply = action.payload;
+
+      function findParentComment(comments) {
+        let parentComment;
+
+        console.log(current(comments));
+
+        for (const comment of comments) {
+          console.log(current(comment));
+          console.log(1);
+          if (comment._id === newReply.parentComment) {
+            parentComment = {
+              ...comment,
+              replies: [...comment.replies, newReply],
+            };
+            break;
+          }
+
+          // for nested replies
+          console.log(2);
+
+          if (comment.replies.length > 0) {
+            parentComment = findParentComment(comment.replies);
+            console.log(3);
+            if (parentComment) {
+              console.log(4);
+              parentComment = {
+                ...comment,
+                replies: comment.replies.map((reply) =>
+                  reply._id == parentComment._id ? parentComment : reply
+                ),
+              };
+              break;
+            }
+          }
+        }
+
+        return parentComment; //top level comment return kr raha hu dost ;
+      }
+
+      let parentComment = findParentComment(state.comments);
+
+      state.comments = state.comments.map((comment) =>
+        comment._id == parentComment._id ? parentComment : comment
+      );
+    },
   },
 });
 
@@ -49,5 +96,6 @@ export const {
   changeLikes,
   setComments,
   setCommentLikes,
+  setReplies,
 } = selectedBlogSlice.actions;
 export default selectedBlogSlice.reducer;

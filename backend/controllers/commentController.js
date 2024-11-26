@@ -78,9 +78,8 @@ async function deleteComment(req, res) {
     await Comment.deleteMany({ _id: { $in: comment.replies } });
 
     await Blog.findByIdAndUpdate(comment.blog._id, {
-      $pull: { comments : id },
+      $pull: { comments: id },
     });
-
 
     await Comment.findByIdAndDelete(id);
 
@@ -88,7 +87,6 @@ async function deleteComment(req, res) {
       success: true,
       message: "Comment deleted successfully",
     });
-    
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -192,6 +190,11 @@ async function addNestedComment(req, res) {
       comment: reply,
       parentComment: parentCommentId,
       user: userId,
+    }).then((reply) => {
+      return reply.populate({
+        path: "user",
+        select: "name email",
+      });
     });
 
     await Comment.findByIdAndUpdate(parentCommentId, {
@@ -201,6 +204,7 @@ async function addNestedComment(req, res) {
     return res.status(200).json({
       success: true,
       message: "Reply added successfully",
+      newReply,
     });
   } catch (error) {
     return res.status(500).json({

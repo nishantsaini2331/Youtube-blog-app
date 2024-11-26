@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsOpen } from "../utils/commentSlice";
 import { useState } from "react";
 import axios from "axios";
-import { setCommentLikes, setComments } from "../utils/selectedBlogSlice";
+import { setCommentLikes, setComments, setReplies } from "../utils/selectedBlogSlice";
 
 import { formatDate } from "../utils/formatDate";
 import toast from "react-hot-toast";
@@ -31,8 +31,8 @@ function Comment() {
 
       console.log(res.data);
 
-      dispatch(setComments(res.data.newComment));
       setComment("");
+      dispatch(setComments(res.data.newComment));
     } catch (error) {
       console.log(error);
     }
@@ -50,6 +50,7 @@ function Comment() {
 
       <div className="my-4">
         <textarea
+        value={comment}
           type="text"
           placeholder="Comment..."
           className=" h-[150px] resize-none drop-shadow w-full p-3 text-lg focus:outline-none"
@@ -83,6 +84,7 @@ function DisplayComments({
   activeReply,
 }) {
   const [reply, setReply] = useState("");
+  const dispatch = useDispatch()
 
   async function handleReply(parentCommentId) {
     try {
@@ -100,10 +102,9 @@ function DisplayComments({
         }
       );
 
-      console.log(res.data);
-
-      //   dispatch(setComments(res.data.newComment));
-      //   setComment("");
+      setReply("");
+      setActiveReply(null);
+      dispatch(setReplies(res.data.newReply));
     } catch (error) {
       console.log(error);
     }
