@@ -66,22 +66,27 @@ async function deleteComment(req, res) {
       });
     }
 
-    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXI1QGdtYWlsLmNvbSIsImlkIjoiNjZlZGFhM2VhM2Y5MDYwOTJiYzNlMjAxIiwiaWF0IjoxNzI2ODUxNjQ3fQ.FUUMC7t9Ij8BTd6ipCC3WMoneEXQVP-UqZou_TDpMG8
-
-    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5pc2hhbnRAZ21haWwuY29tIiwiaWQiOiI2NmViMDFjMTQzYmJjZGRiYTA4OGY2NDYiLCJpYXQiOjE3Mjc3MTMzOTd9.FjEqKCWv6P3V5YNqEPIWt3CoHFB8mwpjpWZlTma5r5w
     if (comment.user != userId && comment.blog.creator != userId) {
       return res.status(500).json({
         message: "You are not authorized",
       });
     }
 
-    await Comment.deleteMany({ _id: { $in: comment.replies } });
+    async function deleteCommentAndReplies(id) {
+      let comment = await Comment.findById(id);
+
+      for (let replyId of comment.replies) {
+        await deleteCommentAndReplies(replyId);
+      }
+
+      await Comment.findByIdAndDelete(id);
+    }
+
+    await deleteCommentAndReplies(id);
 
     await Blog.findByIdAndUpdate(comment.blog._id, {
       $pull: { comments: id },
     });
-
-    await Comment.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
@@ -98,7 +103,7 @@ async function editComment(req, res) {
   try {
     const userId = req.user;
     const { id } = req.params;
-    const { updateComment } = req.body;
+    const { updatedCommentContent } = req.body;
 
     const comment = await Comment.findById(id);
 
@@ -115,7 +120,7 @@ async function editComment(req, res) {
       });
     }
 
-    await Comment.findByIdAndUpdate(id, { comment: updateComment });
+    await Comment.findByIdAndUpdate(id, { comment: updatedCommentContent });
 
     return res.status(200).json({
       success: true,
