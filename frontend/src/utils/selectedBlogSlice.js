@@ -30,27 +30,45 @@ const selectedBlogSlice = createSlice({
     setCommentLikes(state, action) {
       let { commentId, userId } = action.payload;
 
-      let comment = state.comments.find((comment) => comment._id == commentId);
+      //   let comment = state.comments.find((comment) => comment._id == commentId);
 
-      if (comment.likes.includes(userId)) {
-        comment.likes = comment.likes.filter((like) => like !== userId);
-      } else {
-        comment.likes = [...comment.likes, userId];
+      // if (comment.likes.includes(userId)) {
+      //   comment.likes = comment.likes.filter((like) => like !== userId);
+      // } else {
+      //   comment.likes = [...comment.likes, userId];
+      // }
+
+      //   return state;
+
+      function toogleLike(comments) {
+        return comments.map((comment) => {
+          if (comment._id == commentId) {
+            if (comment.likes.includes(userId)) {
+              comment.likes = comment.likes.filter((like) => like !== userId);
+              return comment;
+            } else {
+              comment.likes = [...comment.likes, userId];
+              return comment;
+            }
+          }
+
+          if (comment.replies && comment.replies.length > 0) {
+            return { ...comment, replies: toogleLike(comment.replies) };
+          }
+
+          return comment;
+        });
       }
-
-      return state;
+      state.comments = toogleLike(state.comments);
     },
+
     setReplies(state, action) {
       let newReply = action.payload;
 
       function findParentComment(comments) {
         let parentComment;
 
-        console.log(current(comments));
-
         for (const comment of comments) {
-          console.log(current(comment));
-          console.log(1);
           if (comment._id === newReply.parentComment) {
             parentComment = {
               ...comment,
@@ -59,14 +77,9 @@ const selectedBlogSlice = createSlice({
             break;
           }
 
-          // for nested replies
-          console.log(2);
-
           if (comment.replies.length > 0) {
             parentComment = findParentComment(comment.replies);
-            console.log(3);
             if (parentComment) {
-              console.log(4);
               parentComment = {
                 ...comment,
                 replies: comment.replies.map((reply) =>
@@ -87,6 +100,34 @@ const selectedBlogSlice = createSlice({
         comment._id == parentComment._id ? parentComment : comment
       );
     },
+
+    setUpdatedComments(state, action) {
+      function updateComment(comments) {
+        return comments.map((comment) =>
+          comment._id == action.payload._id
+            ? { ...comment, comment: action.payload.comment }
+            : comment.replies && comment.replies.length > 0
+            ? { ...comment, replies: updateComment(comment.replies) }
+            : comment
+        );
+      }
+
+      state.comments = updateComment(state.comments);
+    },
+
+    deleteCommentAndReply(state, action) {
+      function deleteComment(comments) {
+        return comments
+          .filter((comment) => comment._id !== action.payload)
+          .map((comment) =>
+            comment.replies && comment.replies.length > 0
+              ? { ...comment, replies: deleteComment(comment.replies) }
+              : comment
+          );
+      }
+
+      state.comments = deleteComment(state.comments);
+    },
   },
 });
 
@@ -97,5 +138,7 @@ export const {
   setComments,
   setCommentLikes,
   setReplies,
+  deleteCommentAndReply,
+  setUpdatedComments,
 } = selectedBlogSlice.actions;
 export default selectedBlogSlice.reducer;

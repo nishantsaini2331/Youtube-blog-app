@@ -79,6 +79,12 @@ async function deleteComment(req, res) {
         await deleteCommentAndReplies(replyId);
       }
 
+      if (comment.parentComment) {
+        await Comment.findByIdAndUpdate(comment.parentComment, {
+          $pull: { replies: id },
+        });
+      }
+
       await Comment.findByIdAndDelete(id);
     }
 
@@ -120,11 +126,23 @@ async function editComment(req, res) {
       });
     }
 
-    await Comment.findByIdAndUpdate(id, { comment: updatedCommentContent });
+    const updatedComment = await Comment.findByIdAndUpdate(
+      id,
+      {
+        comment: updatedCommentContent,
+      },
+      { new: true }
+    ).then((comment) => {
+      return comment.populate({
+        path: "user",
+        select: "name email",
+      });
+    });
 
     return res.status(200).json({
       success: true,
       message: "Comment updated successfully",
+      updatedComment,
     });
   } catch (error) {
     return res.status(500).json({

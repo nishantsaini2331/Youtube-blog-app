@@ -3,9 +3,11 @@ import { setIsOpen } from "../utils/commentSlice";
 import { useState } from "react";
 import axios from "axios";
 import {
+  deleteCommentAndReply,
   setCommentLikes,
   setComments,
   setReplies,
+  setUpdatedComments,
 } from "../utils/selectedBlogSlice";
 
 import { formatDate } from "../utils/formatDate";
@@ -44,6 +46,7 @@ function Comment() {
       dispatch(setComments(res.data.newComment));
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.message);
     }
   }
 
@@ -170,7 +173,7 @@ function DisplayComments({
       );
 
       toast.success(res.data.message);
-      //   dispatch(setReplies(res.data.newReply));
+      dispatch(setUpdatedComments(res.data.updatedComment));
     } catch (error) {
       toast.success(error.response.data.message);
       console.log(error);
@@ -192,7 +195,7 @@ function DisplayComments({
       );
 
       toast.success(res.data.message);
-      //   dispatch(setReplies(res.data.newReply));
+      dispatch(deleteCommentAndReply(id));
     } catch (error) {
       toast.success(error.response.data.message);
       console.log(error);
