@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import AuthForm from "./pages/authForm";
+import AuthForm from "./pages/AuthForm";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import AddBlog from "./pages/AddBlog";
 import BlogPage from "./pages/BlogPage";
+import VerifyUser from "./components/VerifyUser";
 
 function App() {
   
@@ -34,6 +35,10 @@ function App() {
                     <Route
                         path="/edit/:id"
                         element={<AddBlog/>}
+                    ></Route>
+                    <Route
+                        path="/verify-email/:verificationToken"
+                        element={<VerifyUser/>}
                     ></Route>
                 </Route>
             </Routes>

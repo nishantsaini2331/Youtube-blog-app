@@ -25,11 +25,14 @@ function AuthForm({ type }) {
         userData
       );
 
-      dispatch(login(res.data.user));
-
-      toast.success(res.data.message);
-
-      navigate("/");
+      if (type == "signup") {
+        toast.success(res.data.message);
+        navigate("/signin");
+      } else {
+        dispatch(login(res.data.user));
+        toast.success(res.data.message);
+        navigate("/");
+      }
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {

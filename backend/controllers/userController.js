@@ -1,6 +1,7 @@
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
-const { generateJWT } = require("../utils/generateToken");
+const { generateJWT, verifyJWT } = require("../utils/generateToken");
+const transporter = require("../utils/transporter");
 
 async function createUser(req, res) {
   const { name, password, email } = req.body;
@@ -29,10 +30,33 @@ async function createUser(req, res) {
     const checkForexistingUser = await User.findOne({ email });
 
     if (checkForexistingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User already registered with this email",
-      });
+      if (checkForexistingUser.verify) {
+        return res.status(400).json({
+          success: false,
+          message: "User already registered with this email",
+        });
+      } else {
+        let verificationToken = await generateJWT({
+          email: checkForexistingUser.email,
+          id: checkForexistingUser._id,
+        });
+
+        //email logic
+
+        const sendingEmail = transporter.sendMail({
+          from: "ns0109375@gmail.com",
+          to: checkForexistingUser.email,
+          subject: "Email Verification",
+          text: "Please verify your email",
+          html: `<h1>Click on the link to verify your email</h1>
+              <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "Please Check Your Email to verify your account",
+        });
+      }
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
@@ -43,22 +67,66 @@ async function createUser(req, res) {
       password: hashedPass,
     });
 
-    let token = await generateJWT({
+    let verificationToken = await generateJWT({
       email: newUser.email,
       id: newUser._id,
     });
 
+    //email logic
+
+    const sendingEmail = transporter.sendMail({
+      from: "ns0109375@gmail.com",
+      to: email,
+      subject: "Email Verification",
+      text: "Please verify your email",
+      html: `<h1>Click on the link to verify your email</h1>
+          <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+    });
+
     return res.status(200).json({
       success: true,
-      message: "User created successfully",
-      user: {
-        id : newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        token,
-      },
+      message: "Please Check Your Email to verify your account",
     });
   } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Please try again",
+      error: err.message,
+    });
+  }
+}
+
+async function verifyToken(req, res) {
+  try {
+    const { verificationToken } = req.params;
+
+    const verifyToken = await verifyJWT(verificationToken);
+
+    if (!verifyToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Token/Email expired",
+      });
+    }
+    const { id } = verifyToken;
+    const user = await User.findByIdAndUpdate(
+      id,
+      { isVerify: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not exist",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Please try again",
@@ -93,12 +161,29 @@ async function login(req, res) {
         message: "User not exist",
       });
     }
-    // if (!(checkForexistingUser.password == password)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Incorrect password",
-    // });
-    // }
+    if (!checkForexistingUser.verify) {
+      // send verification email
+      let verificationToken = await generateJWT({
+        email: checkForexistingUser.email,
+        id: checkForexistingUser._id,
+      });
+
+      //email logic
+
+      const sendingEmail = transporter.sendMail({
+        from: "ns0109375@gmail.com",
+        to: checkForexistingUser.email,
+        subject: "Email Verification",
+        text: "Please verify your email",
+        html: `<h1>Click on the link to verify your email</h1>
+              <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: "Please verify you email",
+      });
+    }
 
     let checkForPass = await bcrypt.compare(
       password,
@@ -123,7 +208,7 @@ async function login(req, res) {
       success: true,
       message: "logged in successfully",
       user: {
-        id : checkForexistingUser._id,
+        id: checkForexistingUser._id,
         name: checkForexistingUser.name,
         email: checkForexistingUser.email,
         token,
@@ -256,4 +341,5 @@ module.exports = {
   updateUser,
   deleteUser,
   login,
+  verifyToken,
 };
