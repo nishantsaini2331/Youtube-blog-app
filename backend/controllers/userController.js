@@ -3,6 +3,25 @@ const bcrypt = require("bcrypt");
 const { generateJWT, verifyJWT } = require("../utils/generateToken");
 const transporter = require("../utils/transporter");
 
+const admin = require("firebase-admin");
+const { getAuth } = require("firebase-admin/auth");
+
+admin.initializeApp({
+    credential: admin.credential.cert({
+      type: FIREBASE_TYPE,
+      project_id: FIREBASE_PROJECT_ID,
+      private_key_id: FIREBASE_PRIVATE_KEY_ID,
+      private_key: FIREBASE_PRIVATE_KEY,
+      client_email: FIREBASE_CLIENT_EMAIL,
+      client_id: FIREBASE_CLIENT_ID,
+      auth_uri: FIREBASE_AUTH_URI,
+      token_uri: FIREBASE_TOKEN_URI,
+      auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+      client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL,
+      universe_domain: FIREBASE_UNIVERSAL_DOMAIN,
+    }),
+  });
+
 async function createUser(req, res) {
   const { name, password, email } = req.body;
 
@@ -30,6 +49,13 @@ async function createUser(req, res) {
     const checkForexistingUser = await User.findOne({ email });
 
     if (checkForexistingUser) {
+      if (checkForexistingUser.googleAuth) {
+        return res.status(400).json({
+          success: true,
+          message:
+            "This email already registered with google. please try through continue with google",
+        });
+      }
       if (checkForexistingUser.verify) {
         return res.status(400).json({
           success: false,
@@ -96,7 +122,7 @@ async function createUser(req, res) {
   }
 }
 
-async function verifyToken(req, res) {
+async function verifyEmail(req, res) {
   try {
     const { verificationToken } = req.params;
 
@@ -135,6 +161,74 @@ async function verifyToken(req, res) {
   }
 }
 
+async function googleAuth(req, res) {
+  try {
+    const { accessToken } = req.body;
+
+    const response = await getAuth().verifyIdToken(accessToken);
+
+    const { name, email } = response;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // already registered
+      if (user.googleAuth) {
+        let token = await generateJWT({
+          email: user.email,
+          id: user._id,
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "logged in successfully",
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            token,
+          },
+        });
+      } else {
+        return res.status(400).json({
+          success: true,
+          message:
+            "This email already registered without google. please try through login form",
+        });
+      }
+    }
+
+    let newUser = await User.create({
+      name,
+      email,
+      googleAuth: true,
+      isVerify: true,
+    });
+
+    let token = await generateJWT({
+      email: newUser.email,
+      id: newUser._id,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Registration in successfully",
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        token,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Please try again",
+      error: err.message,
+    });
+  }
+}
+
 async function login(req, res) {
   const { password, email } = req.body;
 
@@ -161,6 +255,27 @@ async function login(req, res) {
         message: "User not exist",
       });
     }
+
+    if (checkForexistingUser.googleAuth) {
+      return res.status(400).json({
+        success: true,
+        message:
+          "This email already registered with google. please try through continue with google",
+      });
+    }
+
+    let checkForPass = await bcrypt.compare(
+      password,
+      checkForexistingUser.password
+    );
+
+    if (!checkForPass) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect password",
+      });
+    }
+
     if (!checkForexistingUser.verify) {
       // send verification email
       let verificationToken = await generateJWT({
@@ -185,24 +300,10 @@ async function login(req, res) {
       });
     }
 
-    let checkForPass = await bcrypt.compare(
-      password,
-      checkForexistingUser.password
-    );
-
-    if (!checkForPass) {
-      return res.status(400).json({
-        success: false,
-        message: "Incorrect password",
-      });
-    }
-
     let token = await generateJWT({
       email: checkForexistingUser.email,
       id: checkForexistingUser._id,
     });
-
-    // => #, A, a ,1 , 6 <-> 20
 
     return res.status(200).json({
       success: true,
@@ -341,5 +442,6 @@ module.exports = {
   updateUser,
   deleteUser,
   login,
-  verifyToken,
+  verifyEmail,
+  googleAuth,
 };
