@@ -2,7 +2,6 @@ const Blog = require("../models/blogSchema");
 const Comment = require("../models/commentSchema");
 const User = require("../models/userSchema");
 const fs = require("fs");
-const uniqid = require("uniqid");
 const ShortUniqueId = require("short-unique-id");
 const { randomUUID } = new ShortUniqueId({ length: 10 });
 const {

@@ -6,21 +6,21 @@ const transporter = require("../utils/transporter");
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
 
-admin.initializeApp({
-    credential: admin.credential.cert({
-      type: FIREBASE_TYPE,
-      project_id: FIREBASE_PROJECT_ID,
-      private_key_id: FIREBASE_PRIVATE_KEY_ID,
-      private_key: FIREBASE_PRIVATE_KEY,
-      client_email: FIREBASE_CLIENT_EMAIL,
-      client_id: FIREBASE_CLIENT_ID,
-      auth_uri: FIREBASE_AUTH_URI,
-      token_uri: FIREBASE_TOKEN_URI,
-      auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-      client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL,
-      universe_domain: FIREBASE_UNIVERSAL_DOMAIN,
-    }),
-  });
+// admin.initializeApp({
+//     credential: admin.credential.cert({
+//       type: FIREBASE_TYPE,
+//       project_id: FIREBASE_PROJECT_ID,
+//       private_key_id: FIREBASE_PRIVATE_KEY_ID,
+//       private_key: FIREBASE_PRIVATE_KEY,
+//       client_email: FIREBASE_CLIENT_EMAIL,
+//       client_id: FIREBASE_CLIENT_ID,
+//       auth_uri: FIREBASE_AUTH_URI,
+//       token_uri: FIREBASE_TOKEN_URI,
+//       auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+//       client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL,
+//       universe_domain: FIREBASE_UNIVERSAL_DOMAIN,
+//     }),
+//   });
 
 async function createUser(req, res) {
   const { name, password, email } = req.body;
@@ -56,7 +56,7 @@ async function createUser(req, res) {
             "This email already registered with google. please try through continue with google",
         });
       }
-      if (checkForexistingUser.verify) {
+      if (checkForexistingUser.isVerify) {
         return res.status(400).json({
           success: false,
           message: "User already registered with this email",
@@ -276,7 +276,7 @@ async function login(req, res) {
       });
     }
 
-    if (!checkForexistingUser.verify) {
+    if (!checkForexistingUser.isVerify) {
       // send verification email
       let verificationToken = await generateJWT({
         email: checkForexistingUser.email,
@@ -312,6 +312,7 @@ async function login(req, res) {
         id: checkForexistingUser._id,
         name: checkForexistingUser.name,
         email: checkForexistingUser.email,
+        profilePic: checkForexistingUser.profilePic,
         token,
       },
     });

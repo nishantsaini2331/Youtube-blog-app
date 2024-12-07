@@ -19,8 +19,12 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     googleAuth: {
-      type : Boolean,
+      type: Boolean,
       default: false,
+    },
+    profilePic: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

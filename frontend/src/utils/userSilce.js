@@ -13,10 +13,12 @@ const userSlice = createSlice({
 
       localStorage.setItem("user", JSON.stringify(action.payload));
       return action.payload;
-
     },
     logout(state, action) {
-        
+      localStorage.removeItem("user");
+      return {
+        token: null,
+      };
     },
   },
 });
