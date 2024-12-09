@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
+import { handleSaveBlogs } from "../pages/BlogPage";
+import { useSelector } from "react-redux";
 
 function HomePage() {
   const [blogs, setBlogs] = useState([]);
-
+  const { token, id: userId } = useSelector((state) => state.user);
   async function fetchBlogs() {
     let res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs`);
     console.log(res.data.blogs);
@@ -39,6 +41,19 @@ function HomePage() {
                   <div className="flex gap-2">
                     <i className="fi fi-sr-comment-alt text-lg mt-1"></i>
                     <p className="text-lg">{blog.comments.length}</p>
+                  </div>
+                  <div
+                    className="flex gap-2 cursor-pointer"
+                    onClick={(e) => {
+                        e.preventDefault()
+                      handleSaveBlogs(blog._id, token);
+                    }}
+                  >
+                    {blog?.totalSaves?.includes(userId) ? (
+                      <i className="fi fi-sr-bookmark text-lg mt-1"></i>
+                    ) : (
+                      <i className="fi fi-rr-bookmark text-lg mt-1"></i>
+                    )}
                   </div>
                 </div>
               </div>

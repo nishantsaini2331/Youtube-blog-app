@@ -12,6 +12,25 @@ import Comment from "../components/Comment";
 import { setIsOpen } from "../utils/commentSlice";
 // import jwt from "jsonwebtoken"
 
+export async function handleSaveBlogs(id, token) {
+  try {
+    let res = await axios.patch(
+      `${import.meta.env.VITE_BACKEND_URL}/save-blog/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.success(res.data.message);
+
+    // dispatch(addSlectedBlog(blog));
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+}
+
 function BlogPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -40,13 +59,12 @@ function BlogPage() {
         data: { blog },
       } = await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
       setBlogData(blog);
-      
+
       dispatch(addSlectedBlog(blog));
 
       if (blog.likes.includes(userId)) {
         setIsLike((prev) => !prev);
       }
-
     } catch (error) {
       toast.error(error);
     }
@@ -73,19 +91,19 @@ function BlogPage() {
   }
 
   useEffect(() => {
-
-
     fetchBlogById();
 
     return () => {
       //   console.log(window.location.pathname); // currnt path
       //   console.log(location.pathname); //previous path
       dispatch(setIsOpen(false));
-      if (window.location.pathname !== `/edit/${id}` && window.location.pathname !== `/blog/${id}`) {
+      if (
+        window.location.pathname !== `/edit/${id}` &&
+        window.location.pathname !== `/blog/${id}`
+      ) {
         dispatch(removeSelectedBlog());
       }
     };
-    
   }, [id]);
 
   return (
@@ -128,6 +146,19 @@ function BlogPage() {
               ></i>
               <p className="text-2xl">{comments.length}</p>
             </div>
+
+            <div
+              className="flex gap-2 cursor-pointer"
+              onClick={(e) => {
+                handleSaveBlogs(blogData._id, token);
+              }}
+            >
+              {blogData?.totalSaves?.includes(userId) ? (
+                <i className="fi fi-sr-bookmark text-3xl mt-1"></i>
+              ) : (
+                <i className="fi fi-rr-bookmark text-3xl mt-1"></i>
+              )}
+            </div>
           </div>
 
           <div className="my-10">
@@ -135,29 +166,34 @@ function BlogPage() {
               if (block.type == "header") {
                 if (block.data.level == 2) {
                   return (
-                    <h2 className="font-bold text-4xl my-4"
+                    <h2
+                      className="font-bold text-4xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
                   );
                 } else if (block.data.level == 3) {
                   return (
-                    <h3 className="font-bold text-3xl my-4"
+                    <h3
+                      className="font-bold text-3xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h3>
                   );
                 } else if (block.data.level == 4) {
                   return (
-                    <h4  className="font-bold text-2xl my-4"
+                    <h4
+                      className="font-bold text-2xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h4>
                   );
                 }
               } else if (block.type == "paragraph") {
                 return (
-                  <p className="my-4" dangerouslySetInnerHTML={{ __html: block.data.text }}></p>
+                  <p
+                    className="my-4"
+                    dangerouslySetInnerHTML={{ __html: block.data.text }}
+                  ></p>
                 );
-              }
-              else if (block.type == "image") {
+              } else if (block.type == "image") {
                 return (
                   <div className="my-4">
                     <img src={block.data.file.url} alt="" />
@@ -165,7 +201,6 @@ function BlogPage() {
                   </div>
                 );
               }
-
             })}
           </div>
         </div>

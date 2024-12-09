@@ -310,7 +310,7 @@ async function deleteBlog(req, res) {
 
 async function likeBlog(req, res) {
   try {
-    const creator = req.user;
+    const user = req.user;
     const { id } = req.params;
 
     const blog = await Blog.findById(id);
@@ -321,20 +321,59 @@ async function likeBlog(req, res) {
       });
     }
     // console.log(blog.likes);
-    // console.log(blog.likes.includes(creator));
+    // console.log(blog.likes.includes(user));
 
-    if (!blog.likes.includes(creator)) {
-      await Blog.findByIdAndUpdate(id, { $push: { likes: creator } });
+    if (!blog.likes.includes(user)) {
+      await Blog.findByIdAndUpdate(id, { $push: { likes: user } });
+      await User.findByIdAndUpdate(user, { $push: { likeBlogs: id } });
       return res.status(200).json({
         success: true,
         message: "Blog Liked successfully",
         isLiked: true,
       });
     } else {
-      await Blog.findByIdAndUpdate(id, { $pull: { likes: creator } });
+      await Blog.findByIdAndUpdate(id, { $pull: { likes: user } });
+      await User.findByIdAndUpdate(user, { $pull: { likeBlogs: id } });
       return res.status(200).json({
         success: true,
         message: "Blog DisLiked successfully",
+        isLiked: false,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
+async function saveBlog(req, res) {
+  try {
+    const user = req.user;
+    const { id } = req.params;
+
+    const blog = await Blog.findById(id);
+
+    if (!blog) {
+      return res.status(500).json({
+        message: "Blog is not found",
+      });
+    }
+
+    if (!blog.totalSaves.includes(user)) {
+      await Blog.findByIdAndUpdate(id, { $set: { totalSaves: user } });
+      await User.findByIdAndUpdate(user, { $set: { saveBlogs: id } });
+      return res.status(200).json({
+        success: true,
+        message: "Blog has been saved",
+        isLiked: true,
+      });
+    } else {
+      await Blog.findByIdAndUpdate(id, { $unset: { totalSaves: user } });
+      await User.findByIdAndUpdate(user, { $unset: { saveBlogs: id } });
+      return res.status(200).json({
+        success: true,
+        message: "Blog Unsaved",
         isLiked: false,
       });
     }
@@ -352,4 +391,5 @@ module.exports = {
   getBlogs,
   updateBlog,
   likeBlog,
+  saveBlog,
 };

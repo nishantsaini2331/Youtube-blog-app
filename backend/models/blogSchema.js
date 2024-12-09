@@ -49,6 +49,12 @@ const blogSchema = new mongoose.Schema(
         ref: "Comment",
       },
     ],
+    totalSaves: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -2,12 +2,23 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: String,
+    name: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       unique: true,
     },
-    password: String,
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      unique: true,
+    },
     blogs: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +36,37 @@ const userSchema = new mongoose.Schema(
     profilePic: {
       type: String,
       default: null,
+    },
+    bio: {
+      type: String,
+    },
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    saveBlogs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
+    likeBlogs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
+    showLikeBlogs: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

@@ -2,7 +2,8 @@ const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const { generateJWT, verifyJWT } = require("../utils/generateToken");
 const transporter = require("../utils/transporter");
-
+const ShortUniqueId = require("short-unique-id");
+const { randomUUID } = new ShortUniqueId({ length: 5 });
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
 
@@ -86,11 +87,13 @@ async function createUser(req, res) {
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
+    const username = email.split("@")[0] + randomUUID();
 
     const newUser = await User.create({
       name,
       email,
       password: hashedPass,
+      username,
     });
 
     let verificationToken = await generateJWT({
@@ -435,6 +438,7 @@ async function deleteUser(req, res) {
     });
   }
 }
+
 
 module.exports = {
   createUser,

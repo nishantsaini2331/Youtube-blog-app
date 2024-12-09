@@ -7,6 +7,7 @@ const {
   updateBlog,
   deleteBlog,
   likeBlog,
+  saveBlog,
 } = require("../controllers/blogController");
 
 const verifyUser = require("../middlewares/auth");
@@ -58,5 +59,9 @@ route.patch("/blogs/like-comment/:id", verifyUser, likeComment);
 
 // for nested comment
 route.post("/comment/:parentCommentId/:id", verifyUser, addNestedComment);
+
+
+// save blog / bookmark blog
+route.patch("/save-blog/:id", verifyUser, saveBlog);
 
 module.exports = route;

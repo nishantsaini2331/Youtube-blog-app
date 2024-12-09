@@ -10,6 +10,7 @@ const {
   googleAuth,
   verifyEmail,
 } = require("../controllers/userController");
+const verifyUser = require("../middlewares/auth");
 
 const route = express.Router();
 
@@ -20,9 +21,9 @@ route.get("/users", getAllUsers);
 
 route.get("/users/:id", getUserById);
 
-route.patch("/users/:id", updateUser);
+route.patch("/users/:id", verifyUser, updateUser);
 
-route.delete("/users/:id", deleteUser);
+route.delete("/users/:id", verifyUser, deleteUser);
 
 // verify email/token
 
@@ -30,5 +31,7 @@ route.get("/verify-email/:verificationToken", verifyEmail);
 
 //google auth route
 route.post("/google-auth", googleAuth);
+
+
 
 module.exports = route;
