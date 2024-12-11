@@ -9,6 +9,7 @@ const {
   login,
   googleAuth,
   verifyEmail,
+  followUser
 } = require("../controllers/userController");
 const verifyUser = require("../middlewares/auth");
 
@@ -32,6 +33,7 @@ route.get("/verify-email/:verificationToken", verifyEmail);
 //google auth route
 route.post("/google-auth", googleAuth);
 
-
+// follow /unfollow
+route.patch("/follow/:id" , verifyUser , followUser)
 
 module.exports = route;

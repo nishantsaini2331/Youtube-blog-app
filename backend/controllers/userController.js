@@ -439,6 +439,42 @@ async function deleteUser(req, res) {
   }
 }
 
+async function followUser(req, res) {
+  try {
+    const followerId = req.user;
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(500).json({
+        message: "User is not found",
+      });
+    }
+
+    if (!user.followers.includes(followerId)) {
+      await User.findByIdAndUpdate(id, { $set: { followers: followerId } });
+
+      await User.findByIdAndUpdate(followerId, { $set: { following: id } });
+      return res.status(200).json({
+        success: true,
+        message: "Follow",
+      });
+    } else {
+      await User.findByIdAndUpdate(id, { $unset: { followers: followerId } });
+
+      await User.findByIdAndUpdate(followerId, { $unset: { following: id } });
+      return res.status(200).json({
+        success: true,
+        message: "Unfollow",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
 
 module.exports = {
   createUser,
@@ -449,4 +485,5 @@ module.exports = {
   login,
   verifyEmail,
   googleAuth,
+  followUser,
 };

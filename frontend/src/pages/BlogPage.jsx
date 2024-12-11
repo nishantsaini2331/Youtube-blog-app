@@ -10,12 +10,32 @@ import {
 } from "../utils/selectedBlogSlice";
 import Comment from "../components/Comment";
 import { setIsOpen } from "../utils/commentSlice";
+import { formatDate } from "../utils/formatDate";
 // import jwt from "jsonwebtoken"
 
 export async function handleSaveBlogs(id, token) {
   try {
     let res = await axios.patch(
       `${import.meta.env.VITE_BACKEND_URL}/save-blog/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.success(res.data.message);
+
+    // dispatch(addSlectedBlog(blog));
+  } catch (error) {
+    toast.error(error.response.data.message);
+  }
+}
+
+export async function handleFollowCreator(id, token) {
+  try {
+    let res = await axios.patch(
+      `${import.meta.env.VITE_BACKEND_URL}/follow/${id}`,
       {},
       {
         headers: {
@@ -39,7 +59,12 @@ function BlogPage() {
   //   const user = JSON.parse(localStorage.getItem("user"));
   //   const token = JSON.parse(localStorage.getItem("token"));
 
-  const { token, email, id: userId } = useSelector((state) => state.user);
+  const {
+    token,
+    email,
+    id: userId,
+    profilePic,
+  } = useSelector((state) => state.user);
   const { likes, comments, content } = useSelector(
     (state) => state.selectedBlog
   );
@@ -113,7 +138,45 @@ function BlogPage() {
           <h1 className="mt-10 font-bold text-6xl capitalize">
             {blogData.title}
           </h1>
-          <h2 className="my-5 text-3xl">{blogData.creator.name}</h2>
+
+          <div className="flex items-center my-5 gap-3">
+            <div>
+              <div className="w-10 h-10 cursor-pointer">
+                <img
+                  src={
+                    profilePic
+                      ? profilePic
+                      : `https://api.dicebear.com/9.x/initials/svg?seed=${blogData.creator.name}`
+                  }
+                  alt=""
+                  className="rounded-full w-full h-full object-contain"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1 ">
+                <h2 className="text-xl hover:underline cursor-pointer">
+                  {blogData.creator.name}
+                </h2>
+                .
+                <p
+                  onClick={() =>
+                    handleFollowCreator(blogData.creator._id, token)
+                  }
+                  className="text-xl my-2 font-medium text-green-700 cursor-pointer"
+                >
+                  {!blogData?.creator?.followers?.includes(userId)
+                    ? "follow"
+                    : "following"}
+                </p>
+              </div>
+              <div>
+                <span>6 min read</span>
+                <span className="mx-2">{formatDate(blogData.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+
           <img src={blogData.image} alt="" />
 
           {token && email === blogData.creator.email && (
