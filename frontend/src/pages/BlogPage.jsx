@@ -140,24 +140,28 @@ function BlogPage() {
           </h1>
 
           <div className="flex items-center my-5 gap-3">
-            <div>
-              <div className="w-10 h-10 cursor-pointer">
-                <img
-                  src={
-                    profilePic
-                      ? profilePic
-                      : `https://api.dicebear.com/9.x/initials/svg?seed=${blogData.creator.name}`
-                  }
-                  alt=""
-                  className="rounded-full w-full h-full object-contain"
-                />
+            <Link to={`/@${blogData.creator.username}`}>
+              <div>
+                <div className="w-10 h-10 cursor-pointer">
+                  <img
+                    src={
+                      profilePic
+                        ? profilePic
+                        : `https://api.dicebear.com/9.x/initials/svg?seed=${blogData.creator.name}`
+                    }
+                    alt=""
+                    className="rounded-full w-full h-full object-contain"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
             <div className="flex flex-col">
               <div className="flex items-center gap-1 ">
+                <Link to={`/@${blogData.creator.username}`}>
                 <h2 className="text-xl hover:underline cursor-pointer">
                   {blogData.creator.name}
                 </h2>
+                </Link>
                 .
                 <p
                   onClick={() =>

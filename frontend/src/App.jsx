@@ -5,6 +5,7 @@ import HomePage from "./components/HomePage";
 import AddBlog from "./pages/AddBlog";
 import BlogPage from "./pages/BlogPage";
 import VerifyUser from "./components/VerifyUser";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   
@@ -39,6 +40,10 @@ function App() {
                     <Route
                         path="/verify-email/:verificationToken"
                         element={<VerifyUser/>}
+                    ></Route>
+                    <Route
+                        path="/:username"
+                        element={<ProfilePage/>}
                     ></Route>
                 </Route>
             </Routes>

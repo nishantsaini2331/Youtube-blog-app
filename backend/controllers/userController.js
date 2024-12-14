@@ -348,13 +348,23 @@ async function getAllUsers(req, res) {
 
 async function getUserById(req, res) {
   try {
-    const id = req.params.id;
+    const username = req.params.username;
     // db call
-    console.log(id);
+    // console.log(id)
+    console.log(req.user)
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ username })
+      .populate("blogs following likeBlogs saveBlogs")
+      .populate({
+        path: "followers following",
+        select: "name username",
+      })
+      .select("-password -isVerify -__v -email -googleAuth");
 
-    console.log(user);
+    // console.log(user);
+    // if(!user.showLikeBlogs){
+    //     // 
+    // }
     // console.log(user._id);
     // console.log(user.id);
 
