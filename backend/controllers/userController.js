@@ -250,8 +250,11 @@ async function login(req, res) {
       });
     }
 
-    const checkForexistingUser = await User.findOne({ email });
+    const checkForexistingUser = await User.findOne({ email }).select(
+      "password isVerify name email profilePic"
+    );
 
+    console.log(checkForexistingUser);
     if (!checkForexistingUser) {
       return res.status(400).json({
         success: false,
@@ -279,6 +282,7 @@ async function login(req, res) {
       });
     }
 
+    console.log("object", checkForexistingUser.isVerify);
     if (!checkForexistingUser.isVerify) {
       // send verification email
       let verificationToken = await generateJWT({
@@ -302,6 +306,8 @@ async function login(req, res) {
         message: "Please verify you email",
       });
     }
+
+    console.log("object 2");
 
     let token = await generateJWT({
       email: checkForexistingUser.email,
@@ -351,7 +357,7 @@ async function getUserById(req, res) {
     const username = req.params.username;
     // db call
     // console.log(id)
-    console.log(req.user)
+    console.log(req.user);
 
     const user = await User.findOne({ username })
       .populate("blogs following likeBlogs saveBlogs")
@@ -363,7 +369,7 @@ async function getUserById(req, res) {
 
     // console.log(user);
     // if(!user.showLikeBlogs){
-    //     // 
+    //     //
     // }
     // console.log(user._id);
     // console.log(user.id);

@@ -11,8 +11,8 @@ import googleIcon from "../assets/google-icon-logo-svgrepo-com.svg";
 function AuthForm({ type }) {
   const [userData, setUserData] = useState({
     name: "",
-    email: "",
-    password: "",
+    email: "mukesh@gmail.com",
+    password: "mukesh",
   });
 
   const dispatch = useDispatch();
@@ -38,11 +38,11 @@ function AuthForm({ type }) {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      setUserData({
-        name: "",
-        email: "",
-        password: "",
-      });
+    //   setUserData({
+    //     name: "",
+    //     email: "",
+    //     password: "",
+    //   });
     }
   }
 
