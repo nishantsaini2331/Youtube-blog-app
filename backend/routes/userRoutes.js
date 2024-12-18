@@ -12,6 +12,7 @@ const {
   followUser,
 } = require("../controllers/userController");
 const verifyUser = require("../middlewares/auth");
+const upload = require("../utils/multer");
 
 const route = express.Router();
 
@@ -22,7 +23,7 @@ route.get("/users", getAllUsers);
 
 route.get("/users/:username", getUserById);
 
-route.patch("/users/:id", verifyUser, updateUser);
+route.patch("/users/:id", verifyUser, upload.single("profilePic"), updateUser);
 
 route.delete("/users/:id", verifyUser, deleteUser);
 
