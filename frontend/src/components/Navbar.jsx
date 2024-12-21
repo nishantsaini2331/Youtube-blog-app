@@ -5,9 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../utils/userSilce";
 
 function Navbar() {
-  const { token, name, profilePic, username } = useSelector(
-    (state) => state.user
-  );
+  const { token, name, profilePic , username} = useSelector((state) => state.user);
   const [showPopup, setShowPopup] = useState(false);
   const dispatch = useDispatch();
   function handleLogout() {
@@ -84,10 +82,7 @@ function Navbar() {
         </div>
 
         {showPopup ? (
-          <div
-            onMouseLeave={() => setShowPopup(false)}
-            className="w-[150px]   bg-gray-50 border absolute right-2 drop-shadow-md top-14 rounded-xl"
-          >
+          <div className="w-[150px]   bg-gray-50 border absolute right-2 drop-shadow-md top-14 rounded-xl">
             <Link to={`/@${username}`}>
               <p className="popup rounded-t-xl">Profile</p>
             </Link>
