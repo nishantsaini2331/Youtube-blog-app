@@ -255,7 +255,7 @@ async function login(req, res) {
     }
 
     const checkForexistingUser = await User.findOne({ email }).select(
-      "password isVerify name email profilePic"
+      "password isVerify name email profilePic username bio"
     );
 
     console.log(checkForexistingUser);
@@ -286,7 +286,6 @@ async function login(req, res) {
       });
     }
 
-    console.log("object", checkForexistingUser.isVerify);
     if (!checkForexistingUser.isVerify) {
       // send verification email
       let verificationToken = await generateJWT({
@@ -311,8 +310,6 @@ async function login(req, res) {
       });
     }
 
-    console.log("object 2");
-
     let token = await generateJWT({
       email: checkForexistingUser.email,
       id: checkForexistingUser._id,
@@ -326,6 +323,8 @@ async function login(req, res) {
         name: checkForexistingUser.name,
         email: checkForexistingUser.email,
         profilePic: checkForexistingUser.profilePic,
+        username: checkForexistingUser.username,
+        bio: checkForexistingUser.bio,
         token,
       },
     });
@@ -406,21 +405,12 @@ async function updateUser(req, res) {
     // db call
     const id = req.params.id;
 
-<<<<<<< HEAD
     const { name, username, bio } = req.body;
 
     const image = req.file;
-=======
-    const { name, password, email } = req.body;
->>>>>>> parent of 0253990 (user profile page part 3)
 
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { name, password, email },
-      { new: true }
-    );
+    //validation
 
-<<<<<<< HEAD
     const user = await User.findById(id);
 
     
@@ -459,18 +449,15 @@ async function updateUser(req, res) {
 
     await user.save();
 
-=======
-    if (!updatedUser) {
-      return res.status(200).json({
-        success: false,
-        message: "User not found",
-      });
-    }
->>>>>>> parent of 0253990 (user profile page part 3)
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
-      updatedUser,
+      user: {
+        name: user.name,
+        profilePic: user.profilePic,
+        bio: user.bio,
+        username: user.username,
+      },
     });
   } catch (err) {
     return res.status(500).json({
