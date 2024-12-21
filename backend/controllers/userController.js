@@ -6,6 +6,10 @@ const ShortUniqueId = require("short-unique-id");
 const { randomUUID } = new ShortUniqueId({ length: 5 });
 const admin = require("firebase-admin");
 const { getAuth } = require("firebase-admin/auth");
+const {
+  deleteImagefromCloudinary,
+  uploadImage,
+} = require("../utils/uploadImage");
 
 // admin.initializeApp({
 //     credential: admin.credential.cert({
@@ -402,11 +406,31 @@ async function updateUser(req, res) {
     const id = req.params.id;
 
     const { name, username, bio } = req.body;
+
     const image = req.file;
 
     //validation
 
     const user = await User.findById(id);
+
+    
+
+    if (!req.body.profilePic) {
+      if (user.profilePicId) {
+        await deleteImagefromCloudinary(user.profilePicId);
+      }
+      user.profilePic = null;
+      user.profilePicId = null;
+    }
+
+    if (image) {
+      const { secure_url, public_id } = await uploadImage(
+        `data:image/jpeg;base64,${image.buffer.toString("base64")}`
+      );
+
+      user.profilePic = secure_url;
+      user.profilePicId = public_id;
+    }
 
     if (user.username !== username) {
       const findUser = await User.findOne({ username });
@@ -425,18 +449,6 @@ async function updateUser(req, res) {
 
     await user.save();
 
-    // const updatedUser = await User.findByIdAndUpdate(
-    //   id,
-    //   { name, password, email },
-    //   { new: true }
-    // );
-
-    // if (!updatedUser) {
-    //   return res.status(200).json({
-    //     success: false,
-    //     message: "User not found",
-    //   });
-    // }
     return res.status(200).json({
       success: true,
       message: "User updated successfully",

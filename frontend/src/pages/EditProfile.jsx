@@ -43,6 +43,8 @@ function EditProfile() {
   }
 
   async function handleUpdateProfile() {
+    setIsButtonDisabled(true);
+    console.log(userData);
     const formData = new FormData();
     formData.append("name", userData.name);
     formData.append("username", userData.username);
@@ -66,6 +68,7 @@ function EditProfile() {
       dispatch(login({ ...res.data.user, token, email, id: userId }));
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
     }
   }
 
@@ -82,23 +85,36 @@ function EditProfile() {
         <div>
           <div className="">
             <h2 className="text-2xl font-semibold my-2">Photo</h2>
-            <label htmlFor="image" className=" ">
-              {userData?.profilePic ? (
-                <img
-                  src={
-                    typeof userData?.profilePic == "string"
-                      ? userData?.profilePic
-                      : URL.createObjectURL(userData?.profilePic)
-                  }
-                  alt=""
-                  className="aspect-square w-[150px] h-[150px] object-cover border rounded-full"
-                />
-              ) : (
-                <div className=" w-[150px] h-[150px] bg-white border-2 border-dashed rounded-full aspect-square  flex justify-center items-center text-xl">
-                  Select Image
-                </div>
-              )}
-            </label>
+            <div className="flex items-center flex-col gap-3">
+              <label htmlFor="image" className=" ">
+                {userData?.profilePic ? (
+                  <img
+                    src={
+                      typeof userData?.profilePic == "string"
+                        ? userData?.profilePic
+                        : URL.createObjectURL(userData?.profilePic)
+                    }
+                    alt=""
+                    className="aspect-square w-[150px] h-[150px] object-cover border rounded-full"
+                  />
+                ) : (
+                  <div className=" w-[150px] h-[150px] bg-white border-2 border-dashed rounded-full aspect-square  flex justify-center items-center text-xl">
+                    Select Image
+                  </div>
+                )}
+              </label>
+              <h2
+                className="text-lg text-red-500 font-medium cursor-pointer"
+                onClick={() => {
+                  setUserData((prevData) => ({
+                    ...prevData,
+                    profilePic: null,
+                  }));
+                }}
+              >
+                Remove
+              </h2>
+            </div>
             <input
               className="hidden"
               id="image"

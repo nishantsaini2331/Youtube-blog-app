@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import logo from "../../public/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../utils/userSilce";
 
 function Navbar() {
-  const { token, name, profilePic , username} = useSelector((state) => state.user);
+  const { token, name, profilePic, username } = useSelector(
+    (state) => state.user
+  );
   const [showPopup, setShowPopup] = useState(false);
   const dispatch = useDispatch();
   function handleLogout() {
     dispatch(logout());
     setShowPopup(false);
   }
+  
+
+  //   useEffect(() => {
+  //     return () => {
+  //       if (window.location.pathname == "/") {
+  //         setShowPopup(false);
+  //       }
+  //     };
+  //   }, []);
+
   return (
     <>
       <div className="bg-white max-w-full relative flex justify-between items-center h-[70px] px-[30px] border-b drop-shadow-sm">
@@ -72,7 +84,10 @@ function Navbar() {
         </div>
 
         {showPopup ? (
-          <div className="w-[150px]   bg-gray-50 border absolute right-2 drop-shadow-md top-14 rounded-xl">
+          <div
+            onMouseLeave={() => setShowPopup(false)}
+            className="w-[150px]   bg-gray-50 border absolute right-2 drop-shadow-md top-14 rounded-xl"
+          >
             <Link to={`/@${username}`}>
               <p className="popup rounded-t-xl">Profile</p>
             </Link>
