@@ -384,6 +384,35 @@ async function saveBlog(req, res) {
   }
 }
 
+async function searchBlogs(req, res) {
+  try {
+    const { search } = req.query;
+
+    const blogs = await Blog.find({
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ],
+    });
+    if (blogs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Make sure all words are spelled correctly.Try different keywords . Try more general keywords",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      blogs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   createBlog,
   deleteBlog,
@@ -392,4 +421,5 @@ module.exports = {
   updateBlog,
   likeBlog,
   saveBlog,
+  searchBlogs,
 };

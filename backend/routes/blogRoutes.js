@@ -8,6 +8,7 @@ const {
   deleteBlog,
   likeBlog,
   saveBlog,
+  searchBlogs,
 } = require("../controllers/blogController");
 
 const verifyUser = require("../middlewares/auth");
@@ -55,10 +56,12 @@ route.post("/blogs/like/:id", verifyUser, likeBlog);
 route.post("/blogs/comment/:id", verifyUser, addComment);
 route.delete("/blogs/comment/:id", verifyUser, deleteComment);
 route.patch("/blogs/edit-comment/:id", verifyUser, editComment);
-route.patch("/blogs/like-comment/:id", verifyUser, likeComment);
+route.patch("/blogs/like-comment/:id", verifyUser, likeComment); 
 
 // for nested comment
 route.post("/comment/:parentCommentId/:id", verifyUser, addNestedComment);
+
+route.get("/search-blogs", searchBlogs)
 
 
 // save blog / bookmark blog

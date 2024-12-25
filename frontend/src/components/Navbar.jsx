@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../public/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../utils/userSilce";
+import axios from "axios";
 
 function Navbar() {
   const { token, name, profilePic, username } = useSelector(
     (state) => state.user
   );
+
+  const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(null);
+
   const dispatch = useDispatch();
   function handleLogout() {
     dispatch(logout());
     setShowPopup(false);
   }
-  
 
-  //   useEffect(() => {
-  //     return () => {
-  //       if (window.location.pathname == "/") {
-  //         setShowPopup(false);
-  //       }
-  //     };
-  //   }, []);
+  useEffect(() => {
+    if (window.location.pathname !== "/search") {
+      setSearchQuery(null);
+    }
+    return () => {
+      if (window.location.pathname !== "/") {
+        setShowPopup(false);
+      }
+    };
+  }, [window.location.pathname]);
 
   return (
     <>
@@ -39,6 +46,16 @@ function Navbar() {
               type="text"
               className="bg-gray-100 focus:outline-none rounded-full pl-12 p-2 "
               placeholder="Search"
+              value={searchQuery ? searchQuery : ""}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.code == "Enter") {
+                  if (searchQuery.trim()) {
+                    console.log(searchQuery);
+                    navigate(`/search?q=${searchQuery.trim()}`);
+                  }
+                }
+              }}
             />
           </div>
         </div>

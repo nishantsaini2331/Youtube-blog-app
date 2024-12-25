@@ -7,6 +7,7 @@ import BlogPage from "./pages/BlogPage";
 import VerifyUser from "./components/VerifyUser";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfile from "./pages/EditProfile";
+import SearchBlogs from "./components/SearchBlogs";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/add-blog" element={<AddBlog />}></Route>
         <Route path="/blog/:id" element={<BlogPage />}></Route>
         <Route path="/edit/:id" element={<AddBlog />}></Route>
+        <Route path="/search" element={<SearchBlogs />}></Route>
         <Route
           path="/verify-email/:verificationToken"
           element={<VerifyUser />}
