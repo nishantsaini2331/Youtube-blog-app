@@ -1,28 +1,25 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { formatDate } from "../utils/formatDate";
-import { handleSaveBlogs } from "../pages/BlogPage";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import DisplayBlogs from "./DisplayBlogs";
+import usePagination from "../hooks/usePagination";
 
 function HomePage() {
-  const [blogs, setBlogs] = useState([]);
+  const [page, setPage] = useState(1);
   const { token, id: userId } = useSelector((state) => state.user);
 
-  async function fetchBlogs() {
-    let res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs`);
-    console.log(res.data.blogs);
-    setBlogs(res.data.blogs);
-  }
-
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+  const { blogs, hasMore } = usePagination("blogs", {}, 1, page);
 
   return (
     <div className="w-[50%] mx-auto">
-      <DisplayBlogs blogs={blogs} />
+      {blogs.length > 0 && <DisplayBlogs blogs={blogs} />}
+      {hasMore && (
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          className="rounded-3xl mx-auto bg-blue-500 text-white px-7 py-2"
+        >
+          Load more
+        </button>
+      )}
     </div>
   );
 }

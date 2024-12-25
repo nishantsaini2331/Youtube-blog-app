@@ -95,6 +95,11 @@ async function createBlog(req, res) {
 async function getBlogs(req, res) {
   try {
     // const blogs = await Blog.find({ draft: false }).populate("creator");
+
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+
     const blogs = await Blog.find({ draft: false })
       .populate({
         path: "creator",
@@ -103,10 +108,19 @@ async function getBlogs(req, res) {
       .populate({
         path: "likes",
         select: "email name",
-      });
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalBlogs = await Blog.countDocuments({ draft: false });
+
+    // console.log(totalBlogs);
+
     return res.status(200).json({
       message: "Blogs fetched Successfully",
       blogs,
+      hasMore: skip + limit < totalBlogs,
     });
   } catch (error) {
     return res.status(500).json({
@@ -388,12 +402,21 @@ async function searchBlogs(req, res) {
   try {
     const { search } = req.query;
 
-    const blogs = await Blog.find({
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+
+    const query = {
       $or: [
         { title: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
       ],
-    });
+    };
+
+    const blogs = await Blog.find(query, { draft: false })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
     if (blogs.length === 0) {
       return res.status(400).json({
         success: false,
@@ -402,9 +425,12 @@ async function searchBlogs(req, res) {
       });
     }
 
+    const totalBlogs = await Blog.countDocuments(query, { draft: false });
+
     return res.status(200).json({
       success: true,
       blogs,
+      hasMore: skip + limit < totalBlogs,
     });
   } catch (error) {
     return res.status(500).json({
