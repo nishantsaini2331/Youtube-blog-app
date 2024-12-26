@@ -1,26 +1,26 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import DisplayBlogs from "./DisplayBlogs";
 import usePagination from "../hooks/usePagination";
 
 function SearchBlogs() {
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { tag } = useParams();
   const [page, setPage] = useState(1);
 
   const q = searchParams.get("q");
 
-  const { blogs, hasMore } = usePagination(
-    "search-blogs",
-    { search: q },
-    1,
-    page
-  );
+  const query = tag
+    ? { tag: tag.toLowerCase().replace(" ", "-") }
+    : { search: q };
+
+  const { blogs, hasMore } = usePagination("search-blogs", query, 1, page);
+  console.log(hasMore);
 
   return (
     <div className="w-[50%] mx-auto">
       <h1 className="my-10 text-4xl text-gray-500 font-bold ">
-        Results for <span className="text-black">{q}</span>
+        Results for <span className="text-black">{tag ? tag : q}</span>
       </h1>
       {blogs.length > 0 && <DisplayBlogs blogs={blogs} />}
       {hasMore && (

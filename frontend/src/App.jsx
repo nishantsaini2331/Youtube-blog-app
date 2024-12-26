@@ -21,6 +21,7 @@ function App() {
         <Route path="/blog/:id" element={<BlogPage />}></Route>
         <Route path="/edit/:id" element={<AddBlog />}></Route>
         <Route path="/search" element={<SearchBlogs />}></Route>
+        <Route path="/tag/:tag" element={<SearchBlogs />}></Route>
         <Route
           path="/verify-email/:verificationToken"
           element={<VerifyUser />}

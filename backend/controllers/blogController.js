@@ -428,18 +428,24 @@ async function saveBlog(req, res) {
 
 async function searchBlogs(req, res) {
   try {
-    const { search } = req.query;
+    const { search, tag } = req.query;
 
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
     const skip = (page - 1) * limit;
 
-    const query = {
-      $or: [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-      ],
-    };
+    let query;
+
+    if (tag) {
+      query = { tags: tag };
+    } else {
+      query = {
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
 
     const blogs = await Blog.find(query, { draft: false })
       .sort({ createdAt: -1 })
@@ -450,6 +456,7 @@ async function searchBlogs(req, res) {
         success: false,
         message:
           "Make sure all words are spelled correctly.Try different keywords . Try more general keywords",
+        hasMore: false,
       });
     }
 

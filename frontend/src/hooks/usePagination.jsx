@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function usePagination(path, queryParams = {}, limit = 1, page = 1) {
   const [hasMore, setHasMore] = useState(true);
   const [blogs, setBlogs] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchSeachBlogs() {
       try {
@@ -16,8 +19,10 @@ function usePagination(path, queryParams = {}, limit = 1, page = 1) {
         setBlogs((prev) => [...prev, ...res.data.blogs]);
         setHasMore(res.data.hasMore);
       } catch (error) {
+        navigate(-1);
         setBlogs([]);
-        console.log(error);
+        toast.error(error.response.data.message);
+        setHasMore(false);
       }
     }
     fetchSeachBlogs();

@@ -40,7 +40,7 @@ function Navbar() {
               <img src={logo} alt="" />
             </div>
           </Link>
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <i className="fi fi-rr-search absolute text-lg top-1/2 -translate-y-1/2  ml-4 opacity-40"></i>
             <input
               type="text"
@@ -61,10 +61,11 @@ function Navbar() {
         </div>
 
         <div className="flex gap-5 justify-center items-center">
+          <i className="fi fi-rr-search  text-xl sm:hidden "></i>
           <Link to={"/add-blog"}>
             <div className=" flex gap-2 items-center">
               <i className="fi fi-rr-edit text-2xl mt-1"></i>
-              <span className="text-xl">write</span>
+              <span className="text-xl hidden sm:inline">write</span>
             </div>
           </Link>
 

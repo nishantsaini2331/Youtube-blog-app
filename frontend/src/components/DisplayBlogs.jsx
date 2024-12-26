@@ -15,7 +15,7 @@ function DisplayBlogs({ blogs }) {
                 <img src="" alt="" />
                 <p className="">{blog?.creator?.name}</p>
               </div>
-              <h2 className="font-bold text-3xl">{blog?.title}</h2>
+              <h2 className="font-bold text-xl sm:text-2xl">{blog?.title}</h2>
               <h4 className="line-clamp-2">{blog?.description}</h4>
               <div className="flex gap-5">
                 <p>{formatDate(blog?.createdAt)}</p>
@@ -45,7 +45,7 @@ function DisplayBlogs({ blogs }) {
                 </div>
               </div>
             </div>
-            <div className="w-[25%]">
+            <div className="  w-[40%] sm:w-[30%]">
               <img src={blog?.image} alt="" />
             </div>
           </div>
