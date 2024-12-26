@@ -7,7 +7,7 @@ function HomePage() {
   const [page, setPage] = useState(1);
   const { token, id: userId } = useSelector((state) => state.user);
 
-  const { blogs, hasMore } = usePagination("blogs", {}, 1, page);
+  const { blogs, hasMore } = usePagination("blogs", {}, 4, page);
 
   return (
     <div className="w-[50%] mx-auto">

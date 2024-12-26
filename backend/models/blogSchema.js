@@ -55,6 +55,10 @@ const blogSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+
+    tags: {
+      type: [String],
+    },
   },
   { timestamps: true }
 );

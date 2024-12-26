@@ -15,10 +15,12 @@ async function createBlog(req, res) {
   try {
     const creator = req.user;
 
-    const { title, description, draft } = req.body;
+    const { title, description } = req.body;
+    const draft = req.body.draft == "false" ? false : true;
     const { image, images } = req.files;
 
     const content = JSON.parse(req.body.content);
+    const tags = JSON.parse(req.body.tags);
 
     if (!title) {
       return res.status(400).json({
@@ -77,9 +79,17 @@ async function createBlog(req, res) {
       imageId: public_id,
       blogId,
       content,
+      tags,
     });
 
     await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
+
+    if (draft) {
+      return res.status(200).json({
+        message: "Blog Saved as Draft. You can public it from your profile",
+        blog,
+      });
+    }
 
     return res.status(200).json({
       message: "Blog created Successfully",
@@ -191,9 +201,12 @@ async function updateBlog(req, res) {
 
     const { id } = req.params;
 
-    const { title, description, draft } = req.body;
+    const { title, description } = req.body;
+
+    const draft = req.body.draft == "false" ? false : true;
 
     const content = JSON.parse(req.body.content);
+    const tags = JSON.parse(req.body.tags);
     const existingImages = JSON.parse(req.body.existingImages);
 
     const blog = await Blog.findOne({ blogId: id });
@@ -271,8 +284,23 @@ async function updateBlog(req, res) {
     blog.description = description || blog.description;
     blog.draft = draft || blog.draft;
     blog.content = content || blog.content;
+    blog.tags = tags || blog.tags;
 
     await blog.save();
+
+    if (draft) {
+      console.log(draft);
+      console.log("hello");
+    }
+
+    if (draft) {
+      return res.status(200).json({
+        message:
+          "Blog Saved as Draft. You can again public it from your profile page",
+        blog,
+      });
+    }
+    console.log("object");
 
     return res.status(200).json({
       success: true,
