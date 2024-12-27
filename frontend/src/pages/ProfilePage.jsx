@@ -30,7 +30,7 @@ function ProfilePage() {
     } else if (location.pathname === `/${username}/draft-blogs`) {
       return (
         <>
-          {userData._id === userId ? (
+          {userData.showLikedBlogs || userData._id === userId ? (
             <DisplayBlogs blogs={userData.blogs.filter((blog) => blog.draft)} />
           ) : (
             <Navigate to={`/${username}`} />
