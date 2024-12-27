@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../utils/userSilce";
 import Input from "../components/Input";
 import googleIcon from "../assets/google-icon-logo-svgrepo-com.svg";
-// import { googleAuth } from "../utils/firebase";
+import { googleAuth } from "../utils/firebase";
 
 function AuthForm({ type }) {
   const [userData, setUserData] = useState({
@@ -23,7 +23,7 @@ function AuthForm({ type }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/api/v1/${type}`,
+        `${import.meta.env.VITE_BACKEND_URL}/${type}`,
         userData
       );
 
@@ -110,7 +110,7 @@ function AuthForm({ type }) {
         <p className="text-xl font-semibold">or</p>
 
         <div
-          //   onClick={handleGoogleAuth}
+            onClick={handleGoogleAuth}
           className="bg-white border hover:bg-blue-200 w-full flex gap-4 cursor-pointer items-center justify-center overflow-hidden py-3 px-4 rounded-full"
         >
           <p className="text-2xl font-medium">continue with</p>

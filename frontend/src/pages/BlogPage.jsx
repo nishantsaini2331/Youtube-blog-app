@@ -78,7 +78,7 @@ function BlogPage() {
     try {
       let {
         data: { blog },
-      } = await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
+      } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`);
       setBlogData(blog);
 
       dispatch(addSlectedBlog(blog));

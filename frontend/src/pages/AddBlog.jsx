@@ -106,7 +106,7 @@ function AddBlog() {
 
     try {
       const res = await axios.patch(
-        "http://localhost:3000/api/v1/blogs/" + id,
+        `${import.meta.env.VITE_BACKEND_URL}/blogs/` + id,
         formData,
         {
           headers: {

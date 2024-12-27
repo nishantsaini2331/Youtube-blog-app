@@ -178,7 +178,7 @@ async function verifyEmail(req, res) {
     return res.status(500).json({
       success: false,
       message: "Please try again",
-      error: err.message,
+      error: error.message,
     });
   }
 }
@@ -246,7 +246,7 @@ async function googleAuth(req, res) {
     return res.status(500).json({
       success: false,
       message: "Please try again",
-      error: err.message,
+      error: error.message,
     });
   }
 }
