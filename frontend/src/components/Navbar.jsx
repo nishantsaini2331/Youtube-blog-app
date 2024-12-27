@@ -112,7 +112,9 @@ function Navbar() {
             <Link to={`/edit-profile`}>
               <p className="popup ">Edit Profile</p>
             </Link>
-            <p className="popup">Setting</p>
+            <Link to={"/setting"}>
+              <p className="popup"> Setting</p>
+            </Link>
             <p className="popup rounded-b-xl" onClick={handleLogout}>
               Logout
             </p>

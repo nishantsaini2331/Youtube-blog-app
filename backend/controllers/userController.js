@@ -255,7 +255,7 @@ async function login(req, res) {
     }
 
     const checkForexistingUser = await User.findOne({ email }).select(
-      "password isVerify name email profilePic username bio"
+      "password isVerify name email profilePic username bio showLikedBlogs showSavedBlogs"
     );
 
     console.log(checkForexistingUser);
@@ -325,6 +325,8 @@ async function login(req, res) {
         profilePic: checkForexistingUser.profilePic,
         username: checkForexistingUser.username,
         bio: checkForexistingUser.bio,
+        showLikedBlogs: checkForexistingUser.showLikedBlogs,
+        showSavedBlogs: checkForexistingUser.showSavedBlogs,
         token,
       },
     });
@@ -412,8 +414,6 @@ async function updateUser(req, res) {
     //validation
 
     const user = await User.findById(id);
-
-    
 
     if (!req.body.profilePic) {
       if (user.profilePicId) {
@@ -529,6 +529,31 @@ async function followUser(req, res) {
     });
   }
 }
+async function changeSavedLikedBlog(req, res) {
+  try {
+    const userId = req.user;
+    const { showLikedBlogs, showSavedBlogs } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(500).json({
+        message: "User is not found",
+      });
+    }
+
+    await User.findByIdAndUpdate(userId, { showSavedBlogs, showLikedBlogs });
+
+    return res.status(200).json({
+      success: true,
+      message: "Visibilty updated",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
 
 module.exports = {
   createUser,
@@ -540,4 +565,5 @@ module.exports = {
   verifyEmail,
   googleAuth,
   followUser,
+  changeSavedLikedBlog,
 };

@@ -8,6 +8,7 @@ import VerifyUser from "./components/VerifyUser";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfile from "./pages/EditProfile";
 import SearchBlogs from "./components/SearchBlogs";
+import Setting from "./components/Setting";
 
 function App() {
   return (
@@ -27,7 +28,11 @@ function App() {
           element={<VerifyUser />}
         ></Route>
         <Route path="/:username" element={<ProfilePage />}></Route>
+        <Route path="/:username/saved-blogs" element={<ProfilePage />}></Route>
+        <Route path="/:username/liked-blogs" element={<ProfilePage />}></Route>
+        <Route path="/:username/draft-blogs" element={<ProfilePage />}></Route>
         <Route path="/edit-profile" element={<EditProfile />}></Route>
+        <Route path="/setting" element={<Setting />} />
       </Route>
     </Routes>
     // </div>

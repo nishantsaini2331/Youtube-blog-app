@@ -203,6 +203,7 @@ async function updateBlog(req, res) {
 
     const { title, description } = req.body;
 
+    
     const draft = req.body.draft == "false" ? false : true;
 
     const content = JSON.parse(req.body.content);
@@ -282,7 +283,7 @@ async function updateBlog(req, res) {
 
     blog.title = title || blog.title;
     blog.description = description || blog.description;
-    blog.draft = draft || blog.draft;
+    blog.draft = draft;
     blog.content = content || blog.content;
     blog.tags = tags || blog.tags;
 

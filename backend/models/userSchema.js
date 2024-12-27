@@ -71,9 +71,13 @@ const userSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
-    showLikeBlogs: {
+    showLikedBlogs: {
       type: Boolean,
       default: true,
+    },
+    showSavedBlogs: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
