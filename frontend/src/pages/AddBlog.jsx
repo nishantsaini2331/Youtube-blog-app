@@ -37,8 +37,6 @@ function AddBlog() {
     draft: false,
   });
 
-  
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -58,7 +56,7 @@ function AddBlog() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/blogs",
+        `${import.meta.env.VITE_BACKEND_URL}/blogs`,
         formData,
         {
           headers: {
@@ -75,7 +73,6 @@ function AddBlog() {
   }
 
   async function handleUpdateBlog() {
-
     let formData = new FormData();
 
     formData.append("title", blogData.title);
@@ -101,7 +98,6 @@ function AddBlog() {
       }
     });
 
-
     formData.append("existingImages", JSON.stringify(existingImages));
 
     try {
@@ -124,7 +120,6 @@ function AddBlog() {
   }
 
   async function fetchBlogById() {
-
     setBlogData({
       title: title,
       description: description,
