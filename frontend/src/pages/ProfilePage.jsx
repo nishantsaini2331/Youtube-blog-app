@@ -30,7 +30,7 @@ function ProfilePage() {
     } else if (location.pathname === `/${username}/draft-blogs`) {
       return (
         <>
-          {userData.showLikedBlogs || userData._id === userId ? (
+          {userData._id === userId ? (
             <DisplayBlogs blogs={userData.blogs.filter((blog) => blog.draft)} />
           ) : (
             <Navigate to={`/${username}`} />
@@ -40,7 +40,7 @@ function ProfilePage() {
     } else {
       return (
         <>
-          {userData.showSavedBlogs || userData._id === userId ? (
+          {userData.showLikedBlogs || userData._id === userId ? (
             <DisplayBlogs blogs={userData.likeBlogs} />
           ) : (
             <Navigate to={`/${username}`} />
