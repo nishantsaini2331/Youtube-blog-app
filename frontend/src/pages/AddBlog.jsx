@@ -7,7 +7,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import NestedList from "@editorjs/nested-list";
-import CodeTool from "@editorjs/code";
 import Marker from "@editorjs/marker";
 import Underline from "@editorjs/underline";
 import Embed from "@editorjs/embed";
@@ -150,7 +149,6 @@ function AddBlog() {
           config: {},
           inlineToolbar: true,
         },
-        code: CodeTool,
         Marker: Marker,
         Underline: Underline,
         Embed: Embed,
