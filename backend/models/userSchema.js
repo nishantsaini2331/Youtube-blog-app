@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      unique: true,
       select: false,
     },
     blogs: [
