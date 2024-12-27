@@ -40,12 +40,10 @@ function Comment() {
         }
       );
 
-      console.log(res.data);
 
       setComment("");
       dispatch(setComments(res.data.newComment));
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   }
@@ -130,7 +128,6 @@ function DisplayComments({
       setActiveReply(null);
       dispatch(setReplies(res.data.newReply));
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -147,10 +144,8 @@ function DisplayComments({
       );
 
       toast.success(res.data.message);
-      console.log(res.data);
       dispatch(setCommentLikes({ commentId, userId }));
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -176,7 +171,6 @@ function DisplayComments({
       dispatch(setUpdatedComments(res.data.updatedComment));
     } catch (error) {
       toast.success(error.response.data.message);
-      console.log(error);
     } finally {
       setUpdatedCommentContent("");
       setCurrentEditComment(null);
@@ -198,7 +192,6 @@ function DisplayComments({
       dispatch(deleteCommentAndReply(id));
     } catch (error) {
       toast.success(error.response.data.message);
-      console.log(error);
     } finally {
       setUpdatedCommentContent("");
       setCurrentEditComment(null);

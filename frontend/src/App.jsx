@@ -12,7 +12,6 @@ import Setting from "./components/Setting";
 
 function App() {
   return (
-    // <div className=" w-screen h-screen ">
     <Routes>
       <Route path="/" element={<Navbar />}>
         <Route path="/" element={<HomePage />}></Route>
@@ -35,7 +34,6 @@ function App() {
         <Route path="/setting" element={<Setting />} />
       </Route>
     </Routes>
-    // </div>
   );
 }
 

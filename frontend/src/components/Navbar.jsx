@@ -3,7 +3,6 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from "../../public/logo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../utils/userSilce";
-import axios from "axios";
 
 function Navbar() {
   const { token, name, profilePic, username } = useSelector(
@@ -13,6 +12,8 @@ function Navbar() {
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState(null);
+
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const dispatch = useDispatch();
   function handleLogout() {
@@ -34,24 +35,32 @@ function Navbar() {
   return (
     <>
       <div className="bg-white max-w-full relative flex justify-between items-center h-[70px] px-[30px] border-b drop-shadow-sm">
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center relative">
           <Link to={"/"}>
             <div className="">
               <img src={logo} alt="" />
             </div>
           </Link>
-          <div className="relative hidden sm:block">
+
+          <div
+            className={`relative  max-sm:absolute max-sm:z-40 max-sm:top-16 sm:block ${
+              showSearchBar ? " max-sm:block " : " max-sm:hidden "
+            }`}
+          >
             <i className="fi fi-rr-search absolute text-lg top-1/2 -translate-y-1/2  ml-4 opacity-40"></i>
             <input
               type="text"
-              className="bg-gray-100 focus:outline-none rounded-full pl-12 p-2 "
+              className="bg-gray-100 focus:outline-none max-sm:w-[calc(100vw_-_70px)] rounded-full pl-12 p-2 "
               placeholder="Search"
               value={searchQuery ? searchQuery : ""}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.code == "Enter") {
                   if (searchQuery.trim()) {
-                    console.log(searchQuery);
+                    setShowSearchBar(false);
+                    if (showSearchBar) {
+                      setSearchQuery("");
+                    }
                     navigate(`/search?q=${searchQuery.trim()}`);
                   }
                 }
@@ -61,7 +70,10 @@ function Navbar() {
         </div>
 
         <div className="flex gap-5 justify-center items-center">
-          <i className="fi fi-rr-search  text-xl sm:hidden "></i>
+          <i
+            className="fi fi-rr-search  text-xl sm:hidden cursor-pointer "
+            onClick={() => setShowSearchBar((prev) => !prev)}
+          ></i>
           <Link to={"/add-blog"}>
             <div className=" flex gap-2 items-center">
               <i className="fi fi-rr-edit text-2xl mt-1"></i>
@@ -104,7 +116,7 @@ function Navbar() {
         {showPopup ? (
           <div
             onMouseLeave={() => setShowPopup(false)}
-            className="w-[150px]   bg-gray-50 border absolute right-2 drop-shadow-md top-14 rounded-xl"
+            className="w-[150px]   bg-gray-50 border absolute z-40 right-2 drop-shadow-md top-14 rounded-xl"
           >
             <Link to={`/@${username}`}>
               <p className="popup rounded-t-xl">Profile</p>

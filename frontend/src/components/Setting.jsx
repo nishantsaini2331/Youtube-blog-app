@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { updateData } from "../utils/userSilce";
 
 function Setting() {
   const {
@@ -16,6 +17,7 @@ function Setting() {
     showSavedBlogs,
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function handleVisibility() {
     try {
@@ -30,6 +32,7 @@ function Setting() {
           },
         }
       );
+      dispatch(updateData(data));
       toast.success(res.data.message);
       navigate(-1);
     } catch (error) {
@@ -37,7 +40,9 @@ function Setting() {
     }
   }
 
-  return (
+  return token == null ? (
+    <Navigate to={"/signin"} />
+  ) : (
     <div className="w-full p-5 md:w-[800px] flex flex-col items-center h-[calc(100vh_-_250px)] mx-auto justify-center">
       <div className="w-full">
         <h1 className=" my-10 text-2xl font-semibold text-left">Settings</h1>

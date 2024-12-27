@@ -69,15 +69,11 @@ function BlogPage() {
     (state) => state.selectedBlog
   );
   const { isOpen } = useSelector((state) => state.comment);
-  //   console.log(token);
-
-  //   console.log();
 
   const [blogData, setBlogData] = useState(null);
 
   const [islike, setIsLike] = useState(false);
 
-  //   console.log(blogData);
   async function fetchBlogById() {
     try {
       let {
@@ -119,8 +115,6 @@ function BlogPage() {
     fetchBlogById();
 
     return () => {
-      //   console.log(window.location.pathname); // currnt path
-      //   console.log(location.pathname); //previous path
       dispatch(setIsOpen(false));
       if (
         window.location.pathname !== `/edit/${id}` &&
@@ -132,10 +126,10 @@ function BlogPage() {
   }, [id]);
 
   return (
-    <div className="max-w-[700px] mx-auto ">
+    <div className="max-w-[700px] mx-auto p-5 ">
       {blogData ? (
         <div>
-          <h1 className="mt-10 font-bold text-6xl capitalize">
+          <h1 className="mt-10 font-bold text-3xl  sm:text-4xl lg:text-6xl capitalize">
             {blogData.title}
           </h1>
 
@@ -158,9 +152,9 @@ function BlogPage() {
             <div className="flex flex-col">
               <div className="flex items-center gap-1 ">
                 <Link to={`/@${blogData.creator.username}`}>
-                <h2 className="text-xl hover:underline cursor-pointer">
-                  {blogData.creator.name}
-                </h2>
+                  <h2 className="text-xl hover:underline cursor-pointer">
+                    {blogData.creator.name}
+                  </h2>
                 </Link>
                 .
                 <p

@@ -20,7 +20,7 @@ function ProfilePage() {
     } else if (location.pathname === `/${username}/saved-blogs`) {
       return (
         <>
-          {userData._id === userId ? (
+          {userData.showSavedBlogs || userData._id === userId ? (
             <DisplayBlogs blogs={userData.saveBlogs} />
           ) : (
             <Navigate to={`/${username}`} />
@@ -40,7 +40,7 @@ function ProfilePage() {
     } else {
       return (
         <>
-          {userData._id === userId ? (
+          {userData.showSavedBlogs || userData._id === userId ? (
             <DisplayBlogs blogs={userData.likeBlogs} />
           ) : (
             <Navigate to={`/${username}`} />
@@ -59,7 +59,6 @@ function ProfilePage() {
         setUserData(res.data.user);
       } catch (error) {
         toast.error(error.response.data.message);
-        console.log(error);
       }
     }
     fetchUserDetails();
@@ -68,7 +67,7 @@ function ProfilePage() {
   return (
     <div className="w-full  flex justify-center">
       {userData ? (
-        <div className="w-[80%] flex max-lg:flex-col-reverse justify-evenly relative">
+        <div className="w-[80%] flex max-lg:flex-col-reverse justify-evenly ">
           <div className=" max-lg:w-full w-[50%] ">
             <div className="hidden sm:flex justify-between my-10 ">
               <p className="text-4xl font-semibold">{userData.name}</p>
@@ -190,7 +189,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          <div className=" max-lg:w-full w-[20%] lg:border-l max-lg:flex lg:pl-10 lg:min-h-[calc(100vh_-_70px)] ">
+          <div className=" max-lg:w-full w-[20%]   lg:border-l max-lg:flex lg:pl-10 lg:min-h-[calc(100vh_-_70px)] ">
             <div className="my-10">
               <div className="w-20 h-20">
                 <img

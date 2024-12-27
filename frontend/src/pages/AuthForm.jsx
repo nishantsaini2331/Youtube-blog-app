@@ -11,8 +11,8 @@ import googleIcon from "../assets/google-icon-logo-svgrepo-com.svg";
 function AuthForm({ type }) {
   const [userData, setUserData] = useState({
     name: "",
-    email: "mukesh@gmail.com",
-    password: "mukesh",
+    email: "",
+    password: "",
   });
 
   const dispatch = useDispatch();
@@ -38,11 +38,11 @@ function AuthForm({ type }) {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-    //   setUserData({
-    //     name: "",
-    //     email: "",
-    //     password: "",
-    //   });
+      //   setUserData({
+      //     name: "",
+      //     email: "",
+      //     password: "",
+      //   });
     }
   }
 
@@ -55,12 +55,10 @@ function AuthForm({ type }) {
           accessToken: data.accessToken,
         }
       );
-      console.log(res);
       dispatch(login(res.data.user));
       toast.success(res.data.message);
       navigate("/");
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   }
@@ -112,7 +110,7 @@ function AuthForm({ type }) {
         <p className="text-xl font-semibold">or</p>
 
         <div
-        //   onClick={handleGoogleAuth}
+          //   onClick={handleGoogleAuth}
           className="bg-white border hover:bg-blue-200 w-full flex gap-4 cursor-pointer items-center justify-center overflow-hidden py-3 px-4 rounded-full"
         >
           <p className="text-2xl font-medium">continue with</p>

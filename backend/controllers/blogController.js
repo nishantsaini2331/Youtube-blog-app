@@ -1,7 +1,6 @@
 const Blog = require("../models/blogSchema");
 const Comment = require("../models/commentSchema");
 const User = require("../models/userSchema");
-const fs = require("fs");
 const ShortUniqueId = require("short-unique-id");
 const { randomUUID } = new ShortUniqueId({ length: 10 });
 const {
@@ -104,7 +103,7 @@ async function createBlog(req, res) {
 
 async function getBlogs(req, res) {
   try {
-    // const blogs = await Blog.find({ draft: false }).populate("creator");
+    
 
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
@@ -125,7 +124,7 @@ async function getBlogs(req, res) {
 
     const totalBlogs = await Blog.countDocuments({ draft: false });
 
-    // console.log(totalBlogs);
+    
 
     return res.status(200).json({
       message: "Blogs fetched Successfully",
@@ -224,7 +223,7 @@ async function updateBlog(req, res) {
       });
     }
 
-    // console.log(blog);
+    
 
     let imagesToDelete = blog.content.blocks
       .filter((block) => block.type == "image")
@@ -289,10 +288,6 @@ async function updateBlog(req, res) {
 
     await blog.save();
 
-    if (draft) {
-      console.log(draft);
-      console.log("hello");
-    }
 
     if (draft) {
       return res.status(200).json({
@@ -301,7 +296,6 @@ async function updateBlog(req, res) {
         blog,
       });
     }
-    console.log("object");
 
     return res.status(200).json({
       success: true,
@@ -363,8 +357,6 @@ async function likeBlog(req, res) {
         message: "Blog is not found",
       });
     }
-    // console.log(blog.likes);
-    // console.log(blog.likes.includes(user));
 
     if (!blog.likes.includes(user)) {
       await Blog.findByIdAndUpdate(id, { $push: { likes: user } });

@@ -10,22 +10,37 @@ const {
   deleteImagefromCloudinary,
   uploadImage,
 } = require("../utils/uploadImage");
+const {
+  FIREBASE_TYPE,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_PRIVATE_KEY_ID,
+  FIREBASE_PRIVATE_KEY,
+  FIREBASE_CLIENT_EMAIL,
+  FIREBASE_CLIENT_ID,
+  FIREBASE_AUTH_URI,
+  FIREBASE_TOKEN_URI,
+  FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+  FIREBASE_CLIENT_X509_CERT_URL,
+  FIREBASE_UNIVERSAL_DOMAIN,
+  EMAIL_USER,
+  FRONTEND_URL,
+} = require("../config/dotenv.config");
 
-// admin.initializeApp({
-//     credential: admin.credential.cert({
-//       type: FIREBASE_TYPE,
-//       project_id: FIREBASE_PROJECT_ID,
-//       private_key_id: FIREBASE_PRIVATE_KEY_ID,
-//       private_key: FIREBASE_PRIVATE_KEY,
-//       client_email: FIREBASE_CLIENT_EMAIL,
-//       client_id: FIREBASE_CLIENT_ID,
-//       auth_uri: FIREBASE_AUTH_URI,
-//       token_uri: FIREBASE_TOKEN_URI,
-//       auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-//       client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL,
-//       universe_domain: FIREBASE_UNIVERSAL_DOMAIN,
-//     }),
-//   });
+admin.initializeApp({
+  credential: admin.credential.cert({
+    type: FIREBASE_TYPE,
+    project_id: FIREBASE_PROJECT_ID,
+    private_key_id: FIREBASE_PRIVATE_KEY_ID,
+    private_key: FIREBASE_PRIVATE_KEY,
+    client_email: FIREBASE_CLIENT_EMAIL,
+    client_id: FIREBASE_CLIENT_ID,
+    auth_uri: FIREBASE_AUTH_URI,
+    token_uri: FIREBASE_TOKEN_URI,
+    auth_provider_x509_cert_url: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+    client_x509_cert_url: FIREBASE_CLIENT_X509_CERT_URL,
+    universe_domain: FIREBASE_UNIVERSAL_DOMAIN,
+  }),
+});
 
 async function createUser(req, res) {
   const { name, password, email } = req.body;
@@ -75,12 +90,12 @@ async function createUser(req, res) {
         //email logic
 
         const sendingEmail = transporter.sendMail({
-          from: "ns0109375@gmail.com",
+          from: EMAIL_USER,
           to: checkForexistingUser.email,
           subject: "Email Verification",
           text: "Please verify your email",
           html: `<h1>Click on the link to verify your email</h1>
-              <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+              <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
         });
 
         return res.status(200).json({
@@ -108,12 +123,12 @@ async function createUser(req, res) {
     //email logic
 
     const sendingEmail = transporter.sendMail({
-      from: "ns0109375@gmail.com",
+      from: EMAIL_USER,
       to: email,
       subject: "Email Verification",
       text: "Please verify your email",
       html: `<h1>Click on the link to verify your email</h1>
-          <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+      <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
     });
 
     return res.status(200).json({
@@ -258,7 +273,6 @@ async function login(req, res) {
       "password isVerify name email profilePic username bio showLikedBlogs showSavedBlogs"
     );
 
-    console.log(checkForexistingUser);
     if (!checkForexistingUser) {
       return res.status(400).json({
         success: false,
@@ -296,12 +310,12 @@ async function login(req, res) {
       //email logic
 
       const sendingEmail = transporter.sendMail({
-        from: "ns0109375@gmail.com",
+        from: EMAIL_USER,
         to: checkForexistingUser.email,
         subject: "Email Verification",
         text: "Please verify your email",
         html: `<h1>Click on the link to verify your email</h1>
-              <a href="http://localhost:5173/verify-email/${verificationToken}">Verify Email</a>`,
+        <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
       });
 
       return res.status(400).json({
@@ -360,9 +374,6 @@ async function getAllUsers(req, res) {
 async function getUserById(req, res) {
   try {
     const username = req.params.username;
-    // db call
-    // console.log(id)
-    console.log(req.user);
 
     const user = await User.findOne({ username })
       .populate("blogs following likeBlogs saveBlogs")
@@ -371,15 +382,6 @@ async function getUserById(req, res) {
         select: "name username",
       })
       .select("-password -isVerify -__v -email -googleAuth");
-
-    // console.log(user);
-    // if(!user.showLikeBlogs){
-    //     //
-    // }
-    // console.log(user._id);
-    // console.log(user.id);
-
-    // const user1 = await User.findOne()
 
     if (!user) {
       return res.status(200).json({

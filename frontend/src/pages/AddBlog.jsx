@@ -6,7 +6,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
-import List from "@editorjs/list";
 import NestedList from "@editorjs/nested-list";
 import CodeTool from "@editorjs/code";
 import Marker from "@editorjs/marker";
@@ -43,12 +42,6 @@ function AddBlog() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //     if (!token) {
-  //         return navigate("/signin");
-  //     }
-  // }, []);
-
   async function handlePostBlog() {
     formData.append("title", blogData.title);
     formData.append("description", blogData.description);
@@ -82,7 +75,6 @@ function AddBlog() {
   }
 
   async function handleUpdateBlog() {
-    // console.log(blogData);
 
     let formData = new FormData();
 
@@ -109,9 +101,6 @@ function AddBlog() {
       }
     });
 
-    // for (let data of formData.entries()) {
-    //   console.log(data);
-    // }
 
     formData.append("existingImages", JSON.stringify(existingImages));
 
@@ -135,17 +124,6 @@ function AddBlog() {
   }
 
   async function fetchBlogById() {
-    // try {
-    //   let res = await axios.get(`http://localhost:3000/api/v1/blogs/${id}`);
-    //   setBlogData({
-    //     title: res.data.blog.title,
-    //     description: res.data.blog.description,
-    //     image: res.data.blog.image,
-    //   });
-    //   console.log(res);
-    // } catch (error) {
-    //   toast.error(error.response.data.message);
-    // }
 
     setBlogData({
       title: title,
@@ -188,7 +166,6 @@ function AddBlog() {
           config: {
             uploader: {
               uploadByFile: async (image) => {
-                // console.log(image);
                 return {
                   success: 1,
 
@@ -267,7 +244,7 @@ function AddBlog() {
   return token == null ? (
     <Navigate to={"/signin"} />
   ) : (
-    <div className=" p-5 w-[500px] lg:w-[1000px] mx-auto">
+    <div className=" p-5 w-full sm:w-[500px] lg:w-[1000px] mx-auto">
       <div className=" lg:flex lg:justify-between  gap-8">
         <div className=" lg:w-3/6">
           <h2 className="text-2xl font-semibold my-2">Image</h2>

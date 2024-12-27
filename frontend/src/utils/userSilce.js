@@ -7,10 +7,6 @@ const userSlice = createSlice({
   },
   reducers: {
     login(state, action) {
-      //   state.name = action.payload.name;
-      //   state.email = action.payload.email;
-      //   state.token = action.payload.token;
-
       localStorage.setItem("user", JSON.stringify(action.payload));
       return action.payload;
     },
@@ -20,8 +16,14 @@ const userSlice = createSlice({
         token: null,
       };
     },
+
+    updateData(state, action) {
+      const data = action.payload;
+      localStorage.setItem("user", JSON.stringify({ ...state, ...data }));
+      return { ...state, ...data };
+    },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateData } = userSlice.actions;
 export default userSlice.reducer;

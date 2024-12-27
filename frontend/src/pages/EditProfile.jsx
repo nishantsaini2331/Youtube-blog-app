@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../utils/userSilce";
+import { Navigate } from "react-router-dom";
 
 function EditProfile() {
   const {
@@ -44,7 +45,6 @@ function EditProfile() {
 
   async function handleUpdateProfile() {
     setIsButtonDisabled(true);
-    console.log(userData);
     const formData = new FormData();
     formData.append("name", userData.name);
     formData.append("username", userData.username);
@@ -78,9 +78,11 @@ function EditProfile() {
       setIsButtonDisabled(isEqual);
     }
   }, [userData, initialData]);
-  return (
-    <div className="w-full">
-      <div className="w-[35%] mx-auto my-10 px-10">
+  return token == null ? (
+    <Navigate to={"/signin"} />
+  ) : (
+    <div className="w-full p-5">
+      <div className=" w-full  md:w-[70%] lg:w-[55%] mx-auto my-10 lg:px-10">
         <h1 className="text-center text-3xl font-medium my-4">Edit Profile</h1>
         <div>
           <div className="">

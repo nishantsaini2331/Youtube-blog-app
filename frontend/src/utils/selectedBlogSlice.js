@@ -1,4 +1,4 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const selectedBlogSlice = createSlice({
   name: "selectedBlogSlice",
@@ -29,17 +29,6 @@ const selectedBlogSlice = createSlice({
 
     setCommentLikes(state, action) {
       let { commentId, userId } = action.payload;
-
-      //   let comment = state.comments.find((comment) => comment._id == commentId);
-
-      // if (comment.likes.includes(userId)) {
-      //   comment.likes = comment.likes.filter((like) => like !== userId);
-      // } else {
-      //   comment.likes = [...comment.likes, userId];
-      // }
-
-      //   return state;
-
       function toogleLike(comments) {
         return comments.map((comment) => {
           if (comment._id == commentId) {
