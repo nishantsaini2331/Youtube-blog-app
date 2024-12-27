@@ -208,6 +208,11 @@ async function googleAuth(req, res) {
             id: user._id,
             name: user.name,
             email: user.email,
+            profilePic: user.profilePic,
+            username: user.username,
+            showLikedBlogs: user.showLikedBlogs,
+            showSavedBlogs: user.showSavedBlogs,
+            bio: user.bio,
             token,
           },
         });
@@ -219,12 +224,14 @@ async function googleAuth(req, res) {
         });
       }
     }
+    const username = email.split("@")[0] + randomUUID();
 
     let newUser = await User.create({
       name,
       email,
       googleAuth: true,
       isVerify: true,
+      username,
     });
 
     let token = await generateJWT({
@@ -239,6 +246,11 @@ async function googleAuth(req, res) {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        profilePic: newUser.profilePic,
+        username: newUser.username,
+        showLikedBlogs: newUser.showLikedBlogs,
+        showSavedBlogs: newUser.showSavedBlogs,
+        bio: newUser.bio,
         token,
       },
     });
