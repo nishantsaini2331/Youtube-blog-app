@@ -9,7 +9,7 @@ function DisplayBlogs({ blogs }) {
     <div>
       {blogs.length > 0 ? (
         blogs.map((blog) => (
-          <Link to={"/blog/" + blog.blogId}>
+          <Link key={blog._id} to={"/blog/" + blog.blogId}>
             <div key={blog._id} className="w-full my-10 flex justify-between ">
               <div className="w-[60%] flex flex-col gap-2">
                 <div>

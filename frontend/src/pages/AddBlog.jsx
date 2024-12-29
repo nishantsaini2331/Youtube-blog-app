@@ -15,11 +15,12 @@ import ImageTool from "@editorjs/image";
 import TextVariantTune from "@editorjs/text-variant-tune";
 import { setIsOpen } from "../utils/commentSlice";
 import { removeSelectedBlog } from "../utils/selectedBlogSlice";
+import useLoader from "../hooks/useLoader";
 
 function AddBlog() {
   const { id } = useParams();
   const editorjsRef = useRef(null);
-
+  const [isLoading, startLoading, stopLoading] = useLoader();
   const formData = new FormData();
 
   const { token } = useSelector((silce) => silce.user);
@@ -54,6 +55,7 @@ function AddBlog() {
     });
 
     try {
+      startLoading();
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/blogs`,
         formData,
@@ -68,6 +70,8 @@ function AddBlog() {
       navigate("/");
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      stopLoading();
     }
   }
 
@@ -100,6 +104,7 @@ function AddBlog() {
     formData.append("existingImages", JSON.stringify(existingImages));
 
     try {
+      startLoading();
       const res = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/blogs/` + id,
         formData,
@@ -115,6 +120,8 @@ function AddBlog() {
       navigate("/");
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      stopLoading();
     }
   }
 
@@ -365,12 +372,18 @@ function AddBlog() {
         <div id="editorjs" className="w-full"></div>
       </div>
 
-      <button
-        className="bg-blue-500 text-lg py-4 px-7 rounded-full  font-semibold text-white my-6 "
-        onClick={id ? handleUpdateBlog : handlePostBlog}
-      >
-        {blogData.draft ? "Save as Draft" : id ? "Update blog" : "Post blog"}
-      </button>
+      {!isLoading ? (
+        <button
+          className="bg-blue-500 text-lg py-4 px-7 rounded-full  font-semibold text-white my-6 "
+          onClick={id ? handleUpdateBlog : handlePostBlog}
+        >
+          {blogData.draft ? "Save as Draft" : id ? "Update blog" : "Post blog"}
+        </button>
+      ) : (
+        <div className="flex justify-center items-center w-full h-[calc(100vh-500px)]">
+          <span className="loader"></span>
+        </div>
+      )}
     </div>
   );
 }

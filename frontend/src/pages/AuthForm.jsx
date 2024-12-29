@@ -38,11 +38,11 @@ function AuthForm({ type }) {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-      //   setUserData({
-      //     name: "",
-      //     email: "",
-      //     password: "",
-      //   });
+        setUserData({
+          name: "",
+          email: "",
+          password: "",
+        });
     }
   }
 
@@ -64,8 +64,9 @@ function AuthForm({ type }) {
   }
 
   return (
-    <div className="w-full">
-      <div className=" bg-gray-100 p-4 rounded-xl mx-auto max-w-[400px] flex flex-col items-center gap-5 mt-52">
+    
+    <div className="w-full h-[calc(100vh_-_100px)] flex items-center   p-4 justify-center">
+      <div className=" bg-gray-100 p-4 rounded-xl mx-auto w-[400px] flex flex-col items-center justify-center gap-5 ">
         <h1 className="text-3xl">
           {type === "signin" ? "Sign in" : "Sign up"}
         </h1>

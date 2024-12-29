@@ -201,7 +201,7 @@ function DisplayComments({
   return (
     <>
       {comments.map((comment) => (
-        <>
+        <div key={comment._id}>
           <hr className="my-2" />
           <div className="flex flex-col gap-2 my-4">
             {currentEditComment === comment._id ? (
@@ -363,7 +363,7 @@ function DisplayComments({
               </div>
             )}
           </div>
-        </>
+        </div>
       ))}
     </>
   );
