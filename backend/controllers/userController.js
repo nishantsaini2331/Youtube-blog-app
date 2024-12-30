@@ -192,8 +192,7 @@ async function googleAuth(req, res) {
     const { name, email } = response;
 
     let user = await User.findOne({ email });
-    console.log(user);
-
+    
     if (user) {
       // already registered
       if (user.googleAuth) {

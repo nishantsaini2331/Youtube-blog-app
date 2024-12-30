@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../utils/userSilce";
 import Input from "../components/Input";
 import googleIcon from "../assets/google-icon-logo-svgrepo-com.svg";
-import { googleAuth } from "../utils/firebase";
+import { googleAuth, handleRedirectResult } from "../utils/firebase";
 
 function AuthForm({ type }) {
   const [userData, setUserData] = useState({
@@ -38,33 +38,66 @@ function AuthForm({ type }) {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
-        setUserData({
-          name: "",
-          email: "",
-          password: "",
-        });
+      setUserData({
+        name: "",
+        email: "",
+        password: "",
+      });
     }
   }
 
   async function handleGoogleAuth() {
     try {
-      let data = await googleAuth();
+      let userData = await googleAuth();
+
+      if (!userData) {
+        return;
+      }
+      const idToken = await userData.getIdToken();
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/google-auth`,
         {
-          accessToken: data.accessToken,
+          accessToken: idToken,
         }
       );
+
       dispatch(login(res.data.user));
       toast.success(res.data.message);
       navigate("/");
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error("Google Auth Error:", error);
+      toast.error(error.response?.data?.message || "Authentication failed");
     }
   }
 
+  useEffect(() => {
+    // Import the handleRedirectResult from your firebase utils
+    const handleRedirect = async () => {
+      try {
+        const userData = await handleRedirectResult();
+        if (userData) {
+          const idToken = await userData.getIdToken();
+          const res = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/google-auth`,
+            {
+              accessToken: idToken,
+            }
+          );
+          dispatch(login(res.data.user));
+          toast.success(res.data.message);
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Redirect Error:", error);
+        toast.error("Authentication failed");
+      }
+    };
+
+    handleRedirect();
+  }, [dispatch, navigate]);
+
   return (
-    
     <div className="w-full h-[calc(100vh_-_100px)] flex items-center   p-4 justify-center">
       <div className=" bg-gray-100 p-4 rounded-xl mx-auto w-[400px] flex flex-col items-center justify-center gap-5 ">
         <h1 className="text-3xl">
@@ -111,7 +144,7 @@ function AuthForm({ type }) {
         <p className="text-xl font-semibold">or</p>
 
         <div
-            onClick={handleGoogleAuth}
+          onClick={handleGoogleAuth}
           className="bg-white border hover:bg-blue-200 w-full flex gap-4 cursor-pointer items-center justify-center overflow-hidden py-3 px-4 rounded-full"
         >
           <p className="text-2xl font-medium">continue with</p>
