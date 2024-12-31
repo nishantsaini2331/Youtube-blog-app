@@ -3,14 +3,15 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, Navigate, useLocation, useParams } from "react-router-dom";
 import { handleFollowCreator } from "./BlogPage";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DisplayBlogs from "../components/DisplayBlogs";
 
 function ProfilePage() {
   const { username } = useParams();
   const [userData, setUserData] = useState(null);
-  const { token, id: userId } = useSelector((state) => state.user);
+  const { token, id: userId, following } = useSelector((state) => state.user);
   const location = useLocation();
+  const dispatch = useDispatch();
 
   function renderComponent() {
     if (location.pathname === `/${username}`) {
@@ -136,56 +137,6 @@ function ProfilePage() {
               </nav>
 
               {renderComponent()}
-
-              {/* <div>
-                {userData.blogs.map((blog) => (
-                  <Link to={"/blog/" + blog.blogId}>
-                    <div
-                      key={blog._id}
-                      className="w-full my-10 flex justify-between "
-                    >
-                      <div className="w-[60%] flex flex-col gap-2">
-                        <div>
-                          <img src="" alt="" />
-                          <p className="">{blog.creator.name}</p>
-                        </div>
-                        <h2 className="font-bold text-3xl">{blog.title}</h2>
-                        <h4 className="line-clamp-2">{blog.description}</h4>
-                        <div className="flex gap-5">
-                          <p>{formatDate(blog.createdAt)}</p>
-                          <div className="flex gap-7">
-                            <div className="cursor-pointer flex gap-2 ">
-                              <i className="fi fi-rr-social-network text-lg mt-1"></i>
-                              <p className="text-lg">{blog.likes.length}</p>
-                            </div>
-
-                            <div className="flex gap-2">
-                              <i className="fi fi-sr-comment-alt text-lg mt-1"></i>
-                              <p className="text-lg">{blog.comments.length}</p>
-                            </div>
-                            <div
-                              className="flex gap-2 cursor-pointer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleSaveBlogs(blog._id, token);
-                              }}
-                            >
-                              {blog?.totalSaves?.includes(userId) ? (
-                                <i className="fi fi-sr-bookmark text-lg mt-1"></i>
-                              ) : (
-                                <i className="fi fi-rr-bookmark text-lg mt-1"></i>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="w-[25%]">
-                        <img src={blog.image} alt="" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div> */}
             </div>
           </div>
 
@@ -202,7 +153,6 @@ function ProfilePage() {
                 {userData.name}
               </p>
               <p>{userData.followers.length} Followers</p>
-              {/* <p className="text-slate-600 ">22.9K Followers</p> */}
 
               <p className="text-slate-600 text-sm font-normal my-3">
                 {userData.bio}
@@ -214,10 +164,12 @@ function ProfilePage() {
                 </button>
               ) : (
                 <button
-                  onClick={() => handleFollowCreator(userData._id, token)}
+                  onClick={() =>
+                    handleFollowCreator(userData._id, token, dispatch)
+                  }
                   className="bg-green-600 px-7 py-3 rounded-full max-lg:w-full text-white my-3"
                 >
-                  follow
+                  {!following.includes(userData._id) ? "Follow" : "Following"}
                 </button>
               )}
 

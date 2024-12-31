@@ -19,8 +19,17 @@ const userSlice = createSlice({
 
     updateData(state, action) {
       const data = action.payload;
-      localStorage.setItem("user", JSON.stringify({ ...state, ...data }));
-      return { ...state, ...data };
+      if (data[0] === "visibility") {
+        localStorage.setItem("user", JSON.stringify({ ...state, ...data[1] }));
+        return { ...state, ...data };
+      } else if (data[0] === "followers") {
+        return {
+          ...state,
+          following: state.following.includes(data[1])
+            ? state.following.filter((id) => id !== data[1])
+            : [...state.following, data[1]],
+        };
+      }
     },
   },
 });

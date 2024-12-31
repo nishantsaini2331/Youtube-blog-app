@@ -11,6 +11,7 @@ import {
 import Comment from "../components/Comment";
 import { setIsOpen } from "../utils/commentSlice";
 import { formatDate } from "../utils/formatDate";
+import { updateData } from "../utils/userSilce";
 // import jwt from "jsonwebtoken"
 
 export async function handleSaveBlogs(id, token) {
@@ -32,7 +33,7 @@ export async function handleSaveBlogs(id, token) {
   }
 }
 
-export async function handleFollowCreator(id, token) {
+export async function handleFollowCreator(id, token, dispatch) {
   try {
     let res = await axios.patch(
       `${import.meta.env.VITE_BACKEND_URL}/follow/${id}`,
@@ -45,7 +46,7 @@ export async function handleFollowCreator(id, token) {
     );
     toast.success(res.data.message);
 
-    // dispatch(addSlectedBlog(blog));
+    dispatch(updateData(["followers", id]));
   } catch (error) {
     toast.error(error.response.data.message);
   }
@@ -58,6 +59,7 @@ function BlogPage() {
 
   //   const user = JSON.parse(localStorage.getItem("user"));
   //   const token = JSON.parse(localStorage.getItem("token"));
+  const [isBlogSaved, setIsBlogSaved] = useState(false);
 
   const {
     token,
@@ -80,6 +82,7 @@ function BlogPage() {
         data: { blog },
       } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`);
       setBlogData(blog);
+      setIsBlogSaved(blog?.totalSaves?.includes(userId));
 
       dispatch(addSlectedBlog(blog));
 
@@ -107,7 +110,7 @@ function BlogPage() {
       dispatch(changeLikes(userId));
       toast.success(res.data.message);
     } else {
-      return toast.error("Please signin for like this blog");
+      return toast.error("Please signin to like this blog");
     }
   }
 
@@ -139,8 +142,8 @@ function BlogPage() {
                 <div className="w-10 h-10 cursor-pointer">
                   <img
                     src={
-                      profilePic
-                        ? profilePic
+                      blogData?.creator?.profilePic
+                        ? blogData?.creator?.profilePic
                         : `https://api.dicebear.com/9.x/initials/svg?seed=${blogData.creator.name}`
                     }
                     alt=""
@@ -159,7 +162,7 @@ function BlogPage() {
                 .
                 <p
                   onClick={() =>
-                    handleFollowCreator(blogData.creator._id, token)
+                    handleFollowCreator(blogData.creator._id, token, dispatch)
                   }
                   className="text-xl my-2 font-medium text-green-700 cursor-pointer"
                 >
@@ -207,14 +210,15 @@ function BlogPage() {
               ></i>
               <p className="text-2xl">{comments.length}</p>
             </div>
-
             <div
               className="flex gap-2 cursor-pointer"
               onClick={(e) => {
+                e.preventDefault();
                 handleSaveBlogs(blogData._id, token);
+                setIsBlogSaved((prev) => !prev);
               }}
             >
-              {blogData?.totalSaves?.includes(userId) ? (
+              {isBlogSaved ? (
                 <i className="fi fi-sr-bookmark text-3xl mt-1"></i>
               ) : (
                 <i className="fi fi-rr-bookmark text-3xl mt-1"></i>

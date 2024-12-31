@@ -32,7 +32,7 @@ function Setting() {
           },
         }
       );
-      dispatch(updateData(data));
+      dispatch(updateData(["visibility", data]));
       toast.success(res.data.message);
       navigate(-1);
     } catch (error) {

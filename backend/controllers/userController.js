@@ -95,7 +95,7 @@ async function createUser(req, res) {
           subject: "Email Verification",
           text: "Please verify your email",
           html: `<h1>Click on the link to verify your email</h1>
-              <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
+              <a href="${FRONTEND_URL}/verify-email/${verificationToken}">Verify Email</a>`,
         });
 
         return res.status(200).json({
@@ -128,7 +128,7 @@ async function createUser(req, res) {
       subject: "Email Verification",
       text: "Please verify your email",
       html: `<h1>Click on the link to verify your email</h1>
-      <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
+      <a href="${FRONTEND_URL}/verify-email/${verificationToken}">Verify Email</a>`,
     });
 
     return res.status(200).json({
@@ -192,7 +192,7 @@ async function googleAuth(req, res) {
     const { name, email } = response;
 
     let user = await User.findOne({ email });
-    
+
     if (user) {
       // already registered
       if (user.googleAuth) {
@@ -213,6 +213,8 @@ async function googleAuth(req, res) {
             showLikedBlogs: user.showLikedBlogs,
             showSavedBlogs: user.showSavedBlogs,
             bio: user.bio,
+            followers: user.followers,
+            following: user.following,
             token,
           },
         });
@@ -251,6 +253,8 @@ async function googleAuth(req, res) {
         showLikedBlogs: newUser.showLikedBlogs,
         showSavedBlogs: newUser.showSavedBlogs,
         bio: newUser.bio,
+        followers: newUser.followers,
+        following: newUser.following,
         token,
       },
     });
@@ -282,7 +286,7 @@ async function login(req, res) {
     }
 
     const checkForexistingUser = await User.findOne({ email }).select(
-      "password isVerify name email profilePic username bio showLikedBlogs showSavedBlogs"
+      "password isVerify name email profilePic username bio showLikedBlogs showSavedBlogs followers following googleAuth"
     );
 
     if (!checkForexistingUser) {
@@ -327,7 +331,7 @@ async function login(req, res) {
         subject: "Email Verification",
         text: "Please verify your email",
         html: `<h1>Click on the link to verify your email</h1>
-        <a href="${FRONTEND_URL}verify-email/${verificationToken}">Verify Email</a>`,
+        <a href="${FRONTEND_URL}/verify-email/${verificationToken}">Verify Email</a>`,
       });
 
       return res.status(400).json({
@@ -339,6 +343,19 @@ async function login(req, res) {
     let token = await generateJWT({
       email: checkForexistingUser.email,
       id: checkForexistingUser._id,
+    });
+    console.log({
+      id: checkForexistingUser._id,
+      name: checkForexistingUser.name,
+      email: checkForexistingUser.email,
+      profilePic: checkForexistingUser.profilePic,
+      username: checkForexistingUser.username,
+      bio: checkForexistingUser.bio,
+      showLikedBlogs: checkForexistingUser.showLikedBlogs,
+      showSavedBlogs: checkForexistingUser.showSavedBlogs,
+      followers: checkForexistingUser.followers,
+      following: checkForexistingUser.following,
+      token,
     });
 
     return res.status(200).json({
@@ -353,6 +370,8 @@ async function login(req, res) {
         bio: checkForexistingUser.bio,
         showLikedBlogs: checkForexistingUser.showLikedBlogs,
         showSavedBlogs: checkForexistingUser.showSavedBlogs,
+        followers: checkForexistingUser.followers,
+        following: checkForexistingUser.following,
         token,
       },
     });
