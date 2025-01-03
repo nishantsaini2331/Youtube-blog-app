@@ -159,7 +159,7 @@ function BlogPage() {
                     {blogData.creator.name}
                   </h2>
                 </Link>
-                {userId === blogData.creator._id && (
+                {userId !== blogData.creator._id && (
                   <p
                     onClick={() =>
                       handleFollowCreator(blogData.creator._id, token, dispatch)
