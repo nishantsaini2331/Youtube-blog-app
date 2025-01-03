@@ -159,17 +159,19 @@ function BlogPage() {
                     {blogData.creator.name}
                   </h2>
                 </Link>
-                .
-                <p
-                  onClick={() =>
-                    handleFollowCreator(blogData.creator._id, token, dispatch)
-                  }
-                  className="text-xl my-2 font-medium text-green-700 cursor-pointer"
-                >
-                  {!blogData?.creator?.followers?.includes(userId)
-                    ? "follow"
-                    : "following"}
-                </p>
+                {userId === blogData.creator._id && (
+                  <p
+                    onClick={() =>
+                      handleFollowCreator(blogData.creator._id, token, dispatch)
+                    }
+                    className="text-xl my-2 font-medium text-green-700 cursor-pointer"
+                  >
+                    .
+                    {!blogData?.creator?.followers?.includes(userId)
+                      ? "follow"
+                      : "following"}
+                  </p>
+                )}
               </div>
               <div>
                 <span>6 min read</span>
