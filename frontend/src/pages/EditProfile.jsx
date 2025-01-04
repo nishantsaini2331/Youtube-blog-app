@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../utils/userSilce";
 import { Navigate } from "react-router-dom";
+import useLoader from "../hooks/useLoader";
 
 function EditProfile() {
   const {
@@ -17,6 +18,7 @@ function EditProfile() {
   } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+  const [isLoading, startLoading, stopLoading] = useLoader();
 
   const [userData, setUserData] = useState({
     profilePic,
@@ -44,6 +46,7 @@ function EditProfile() {
   }
 
   async function handleUpdateProfile() {
+    startLoading();
     setIsButtonDisabled(true);
     const formData = new FormData();
     formData.append("name", userData.name);
@@ -69,6 +72,7 @@ function EditProfile() {
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
+      stopLoading();
     }
   }
 
@@ -162,15 +166,19 @@ function EditProfile() {
             />
           </div>
 
-          <button
-            disabled={isButtonDisabled}
-            className={` px-7 py-3 rounded-full text-white my-3  ${
-              isButtonDisabled ? " bg-green-300 " : " bg-green-600 "
-            } `}
-            onClick={handleUpdateProfile}
-          >
-            Update
-          </button>
+          {!isLoading ? (
+            <button
+              disabled={isButtonDisabled}
+              className={` px-7 py-3 rounded-full text-white my-3  ${
+                isButtonDisabled ? " bg-green-300 " : " bg-green-600 "
+              } `}
+              onClick={handleUpdateProfile}
+            >
+              Update
+            </button>
+          ) : (
+            <span className="loader"></span>
+          )}
         </div>
       </div>
     </div>

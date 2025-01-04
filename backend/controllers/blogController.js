@@ -103,8 +103,6 @@ async function createBlog(req, res) {
 
 async function getBlogs(req, res) {
   try {
-    
-
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
     const skip = (page - 1) * limit;
@@ -123,8 +121,6 @@ async function getBlogs(req, res) {
       .limit(limit);
 
     const totalBlogs = await Blog.countDocuments({ draft: false });
-
-    
 
     return res.status(200).json({
       message: "Blogs fetched Successfully",
@@ -146,12 +142,12 @@ async function getBlog(req, res) {
         path: "comments",
         populate: {
           path: "user",
-          select: "name email",
+          select: "name email username profilePic",
         },
       })
       .populate({
         path: "creator",
-        select: "name email followers username",
+        select: "name email followers username profilePic",
       })
       .lean();
 
@@ -162,7 +158,7 @@ async function getBlog(req, res) {
             path: "replies",
             populate: {
               path: "user",
-              select: "name email",
+              select: "name email username profilePic",
             },
           })
           .lean();
@@ -202,7 +198,6 @@ async function updateBlog(req, res) {
 
     const { title, description } = req.body;
 
-    
     const draft = req.body.draft == "false" ? false : true;
 
     const content = JSON.parse(req.body.content);
@@ -222,8 +217,6 @@ async function updateBlog(req, res) {
         message: "You are not authorized for this action",
       });
     }
-
-    
 
     let imagesToDelete = blog.content.blocks
       .filter((block) => block.type == "image")
@@ -287,7 +280,6 @@ async function updateBlog(req, res) {
     blog.tags = tags || blog.tags;
 
     await blog.save();
-
 
     if (draft) {
       return res.status(200).json({

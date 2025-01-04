@@ -2,7 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const selectedBlogSlice = createSlice({
   name: "selectedBlogSlice",
-  initialState: JSON.parse(localStorage.getItem("selectedBlog")) || {},
+  initialState: JSON.parse(localStorage.getItem("selectedBlog")) || {
+    creator: { _id: "" },
+    likes: [],
+    comments: [],
+  },
   reducers: {
     addSlectedBlog(state, action) {
       localStorage.setItem("selectedBlog", JSON.stringify(action.payload));

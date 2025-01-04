@@ -10,7 +10,6 @@ import NestedList from "@editorjs/nested-list";
 import Marker from "@editorjs/marker";
 import Underline from "@editorjs/underline";
 import Embed from "@editorjs/embed";
-import RawTool from "@editorjs/raw";
 import ImageTool from "@editorjs/image";
 import TextVariantTune from "@editorjs/text-variant-tune";
 import { setIsOpen } from "../utils/commentSlice";
@@ -159,7 +158,6 @@ function AddBlog() {
         Marker: Marker,
         Underline: Underline,
         Embed: Embed,
-        raw: RawTool,
         textVariant: TextVariantTune,
         image: {
           class: ImageTool,
@@ -190,11 +188,11 @@ function AddBlog() {
   function handleKeyDown(e) {
     const tag = e.target.value.toLowerCase();
 
-    if (e.code === "Space") {
+    if (e.code === "Space" || e.keyCode == "32") {
       e.preventDefault();
     }
 
-    if (e.code == "Enter" && tag !== "") {
+    if ((e.code == "Enter" || e.keyCode == "13") && tag !== "") {
       if (blogData.tags.length >= 10) {
         e.target.value = "";
         return toast.error("You can add upto maximum 10 tags");

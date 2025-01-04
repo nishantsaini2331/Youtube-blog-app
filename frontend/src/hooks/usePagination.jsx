@@ -20,11 +20,11 @@ function usePagination(path, queryParams = {}, limit = 1, page = 1) {
           }
         );
         setBlogs((prev) => [...prev, ...res.data.blogs]);
-        setHasMore(res.data.hasMore);
+        setHasMore(res?.data?.hasMore);
       } catch (error) {
         navigate(-1);
         setBlogs([]);
-        toast.error(error.response.data.message);
+        toast.error(error?.response?.data?.message);
         setHasMore(false);
       } finally {
         stopLoading();

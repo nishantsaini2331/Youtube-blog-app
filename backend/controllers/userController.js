@@ -344,19 +344,6 @@ async function login(req, res) {
       email: checkForexistingUser.email,
       id: checkForexistingUser._id,
     });
-    console.log({
-      id: checkForexistingUser._id,
-      name: checkForexistingUser.name,
-      email: checkForexistingUser.email,
-      profilePic: checkForexistingUser.profilePic,
-      username: checkForexistingUser.username,
-      bio: checkForexistingUser.bio,
-      showLikedBlogs: checkForexistingUser.showLikedBlogs,
-      showSavedBlogs: checkForexistingUser.showSavedBlogs,
-      followers: checkForexistingUser.followers,
-      following: checkForexistingUser.following,
-      token,
-    });
 
     return res.status(200).json({
       success: true,

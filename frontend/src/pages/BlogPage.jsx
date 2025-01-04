@@ -48,6 +48,7 @@ export async function handleFollowCreator(id, token, dispatch) {
 
     dispatch(updateData(["followers", id]));
   } catch (error) {
+    console.log(error);
     toast.error(error.response.data.message);
   }
 }
@@ -66,10 +67,12 @@ function BlogPage() {
     email,
     id: userId,
     profilePic,
+    following,
   } = useSelector((state) => state.user);
-  const { likes, comments, content } = useSelector(
+  const { likes, comments, content, creator } = useSelector(
     (state) => state.selectedBlog
   );
+
   const { isOpen } = useSelector((state) => state.comment);
 
   const [blogData, setBlogData] = useState(null);
@@ -167,7 +170,7 @@ function BlogPage() {
                     className="text-xl my-2 font-medium text-green-700 cursor-pointer"
                   >
                     .
-                    {!blogData?.creator?.followers?.includes(userId)
+                    {!following?.includes(creator?._id)
                       ? "follow"
                       : "following"}
                   </p>
@@ -229,11 +232,12 @@ function BlogPage() {
           </div>
 
           <div className="my-10">
-            {content.blocks.map((block) => {
+            {content.blocks.map((block, index) => {
               if (block.type == "header") {
                 if (block.data.level == 2) {
                   return (
                     <h2
+                      key={index}
                       className="font-bold text-4xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
@@ -241,6 +245,7 @@ function BlogPage() {
                 } else if (block.data.level == 3) {
                   return (
                     <h3
+                      key={index}
                       className="font-bold text-3xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h3>
@@ -248,6 +253,7 @@ function BlogPage() {
                 } else if (block.data.level == 4) {
                   return (
                     <h4
+                      key={index}
                       className="font-bold text-2xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h4>
@@ -256,23 +262,44 @@ function BlogPage() {
               } else if (block.type == "paragraph") {
                 return (
                   <p
+                    key={index}
                     className="my-4"
                     dangerouslySetInnerHTML={{ __html: block.data.text }}
                   ></p>
                 );
               } else if (block.type == "image") {
                 return (
-                  <div className="my-4">
+                  <div className="my-4" key={index}>
                     <img src={block.data.file.url} alt="" />
                     <p className="text-center my-2">{block.data.caption}</p>
                   </div>
                 );
+              } else if (block.type == "List") {
+                if (block.data.style == "ordered") {
+                  return (
+                    <ol key={index} className="list-decimal my-4">
+                      {block.data.items.map((item, index) => (
+                        <li key={index}>{item?.content}</li>
+                      ))}
+                    </ol>
+                  );
+                } else {
+                  return (
+                    <ul key={index} className="list-disc my-4">
+                      {block.data.items.map((item, index) => (
+                        <li key={index}>{item?.content}</li>
+                      ))}
+                    </ul>
+                  );
+                }
               }
             })}
           </div>
         </div>
       ) : (
-        <h1>Loading....</h1>
+        <div className="flex justify-center items-center w-full h-[calc(100vh-500px)]">
+          <span className="loader"></span>
+        </div>
       )}
 
       {isOpen && <Comment />}

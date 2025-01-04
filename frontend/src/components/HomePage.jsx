@@ -47,7 +47,7 @@ function HomePage() {
         </>
       ) : (
         <div className="flex justify-center items-center w-full h-[calc(100vh-500px)]">
-      <span className="loader"></span>      
+          <span className="loader"></span>
         </div>
       )}
     </div>

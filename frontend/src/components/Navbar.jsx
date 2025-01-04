@@ -55,7 +55,7 @@ function Navbar() {
               value={searchQuery ? searchQuery : ""}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.code == "Enter" || e.code == "NumpadEnter") {
+                if (e.code == "Enter" || e.code == "NumpadEnter" || e.keyCode == "13") {
                   if (searchQuery.trim()) {
                     setShowSearchBar(false);
                     if (showSearchBar) {

@@ -150,12 +150,12 @@ function ProfilePage() {
                 />
               </div>
               <p className="text-base max-md:text-lg font-medium my-3">
-                {userData.name}
+                {userData?.name}
               </p>
               <p>{userData.followers.length} Followers</p>
 
               <p className="text-slate-600 text-sm font-normal my-3">
-                {userData.bio}
+                {userData?.bio}
               </p>
 
               {userId === userData._id ? (
@@ -165,11 +165,11 @@ function ProfilePage() {
               ) : (
                 <button
                   onClick={() =>
-                    handleFollowCreator(userData._id, token, dispatch)
+                    handleFollowCreator(userData?._id, token, dispatch)
                   }
                   className="bg-green-600 px-7 py-3 rounded-full max-lg:w-full text-white my-3"
                 >
-                  {!following.includes(userData._id) ? "Follow" : "Following"}
+                  {!following.includes(userData?._id) ? "Follow" : "Following"}
                 </button>
               )}
 
@@ -177,25 +177,29 @@ function ProfilePage() {
                 <h2 className="font-semibold">Following</h2>
 
                 <div className="my-5 ">
-                  {userData.following.map((user) => (
-                    <div className="flex justify-between items-center">
-                      <Link to={`/@${user.username}`}>
-                        <div className="flex gap-2 items-center hover:underline cursor-pointer">
-                          <div className="w-4 h-4">
-                            <img
-                              src={`https://api.dicebear.com/9.x/initials/svg?seed=${user.name}`}
-                              alt=""
-                              className="rounded-full"
-                            />
+                  {userData?.following?.length > 0 ? (
+                    userData?.following?.map((user) => (
+                      <div className="flex justify-between items-center">
+                        <Link to={`/@${user.username}`}>
+                          <div className="flex gap-2 items-center hover:underline cursor-pointer">
+                            <div className="w-4 h-4">
+                              <img
+                                src={`https://api.dicebear.com/9.x/initials/svg?seed=${user.name}`}
+                                alt=""
+                                className="rounded-full"
+                              />
+                            </div>
+                            <p className="text-base font-medium my-3">
+                              {user.name}
+                            </p>
                           </div>
-                          <p className="text-base font-medium my-3">
-                            {user.name}
-                          </p>
-                        </div>
-                      </Link>
-                      <i className="fi fi-bs-menu-dots cursor-pointer opacity-70"></i>
-                    </div>
-                  ))}
+                        </Link>
+                        <i className="fi fi-bs-menu-dots cursor-pointer opacity-70"></i>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No following found</p>
+                  )}
                 </div>
               </div>
             </div>

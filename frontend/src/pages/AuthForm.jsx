@@ -18,6 +18,7 @@ function AuthForm({ type }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
   async function handleAuthForm(e) {
     e.preventDefault();
 
@@ -48,23 +49,23 @@ function AuthForm({ type }) {
 
   async function handleGoogleAuth() {
     try {
-      let userData = await googleAuth();
+        let userData = await googleAuth();
 
-      if (!userData) {
-        return;
-      }
-      const idToken = await userData.getIdToken();
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/google-auth`,
-        {
-          accessToken: idToken,
+        if (!userData) {
+          return;
         }
-      );
+        const idToken = await userData.getIdToken();
 
-      dispatch(login(res.data.user));
-      toast.success(res.data.message);
-      navigate("/");
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/google-auth`,
+          {
+            accessToken: idToken,
+          }
+        );
+
+        dispatch(login(res.data.user));
+        toast.success(res.data.message);
+        navigate("/");
     } catch (error) {
       console.error("Google Auth Error:", error);
       toast.error(error.response?.data?.message || "Authentication failed");

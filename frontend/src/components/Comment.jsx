@@ -12,6 +12,7 @@ import {
 
 import { formatDate } from "../utils/formatDate";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 function Comment() {
   const dispatch = useDispatch();
@@ -39,7 +40,6 @@ function Comment() {
           },
         }
       );
-
 
       setComment("");
       dispatch(setComments(res.data.newComment));
@@ -128,6 +128,7 @@ function DisplayComments({
       setActiveReply(null);
       dispatch(setReplies(res.data.newReply));
     } catch (error) {
+      toast.error(error.response.data.message);
     }
   }
 
@@ -145,8 +146,7 @@ function DisplayComments({
 
       toast.success(res.data.message);
       dispatch(setCommentLikes({ commentId, userId }));
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   function handleActiveReply(id) {
@@ -233,29 +233,39 @@ function DisplayComments({
             ) : (
               <>
                 <div className="flex w-full justify-between">
-                  <div className="flex gap-2">
-                    <div className="w-10 h-10">
-                      <img
-                        src={`https://api.dicebear.com/9.x/initials/svg?seed=${comment.user.name}`}
-                        alt=""
-                        className="rounded-full"
-                      />
+                  <Link
+                    to={`/@${comment.user.username}`}
+                    className="flex gap-2"
+                  >
+                    <div className="flex gap-2">
+                      <div className="w-10 h-10">
+                        <img
+                          //   src={`https://api.dicebear.com/9.x/initials/svg?seed=${comment.user.name}`}
+                          src={
+                            comment?.user?.profilePic
+                              ? comment?.user?.profilePic
+                              : `https://api.dicebear.com/9.x/initials/svg?seed=${comment?.user?.name}`
+                          }
+                          alt=""
+                          className="rounded-full"
+                        />
+                      </div>
+                      <div>
+                        <p className="capitalize font-medium">
+                          {comment?.user?.name}
+                        </p>
+                        <p>{formatDate(comment?.createdAt)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="capitalize font-medium">
-                        {comment.user.name}
-                      </p>
-                      <p>{formatDate(comment.createdAt)}</p>
-                    </div>
-                  </div>
+                  </Link>
 
-                  {comment.user._id === userId || userId === creatorId ? (
-                    currentPopup == comment._id ? (
+                  {comment?.user?._id === userId || userId === creatorId ? (
+                    currentPopup == comment?._id ? (
                       <div className="bg-gray-200 w-[70px] rounded-lg">
                         <i
                           onClick={() =>
                             setCurrentPopup((prev) =>
-                              prev == comment._id ? null : comment._id
+                              prev == comment?._id ? null : comment?._id
                             )
                           }
                           className="fi fi-br-cross relative left-12 text-sm mt-1 cursor-pointer"

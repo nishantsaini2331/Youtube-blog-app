@@ -47,7 +47,11 @@ function DisplayBlogs({ blogs }) {
                 </div>
               </div>
               <div className="w-[40%] sm:w-[30%] ">
-                <img src={blog?.image} alt=""  className="aspect-video object-cover w-full"/>
+                <img
+                  src={blog?.image}
+                  alt=""
+                  className="aspect-video object-cover w-full"
+                />
               </div>
             </div>
           </Link>
