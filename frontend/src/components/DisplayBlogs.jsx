@@ -4,7 +4,6 @@ import { formatDate } from "../utils/formatDate";
 import { useSelector } from "react-redux";
 
 function DisplayBlogs({ blogs }) {
-    console.log(blogs);
   const { token, id: userId } = useSelector((state) => state.user);
   return (
     <div>
