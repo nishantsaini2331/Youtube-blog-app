@@ -371,12 +371,24 @@ function AddBlog() {
       </div>
 
       {!isLoading ? (
-        <button
-          className="bg-blue-500 text-lg py-4 px-7 rounded-full  font-semibold text-white my-6 "
-          onClick={id ? handleUpdateBlog : handlePostBlog}
-        >
-          {blogData.draft ? "Save as Draft" : id ? "Update blog" : "Post blog"}
-        </button>
+        <div>
+          <button
+            className="bg-blue-500 px-7 py-3 rounded-full  font-semibold text-white my-6 "
+            onClick={id ? handleUpdateBlog : handlePostBlog}
+          >
+            {blogData.draft
+              ? "Save as Draft"
+              : id
+              ? "Update blog"
+              : "Post blog"}
+          </button>
+          <button
+            className={` mx-4 px-7 py-3 rounded-full text-white my-3 bg-black`}
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </button>
+        </div>
       ) : (
         <div className="flex justify-center items-center w-full h-[calc(100vh-500px)]">
           <span className="loader"></span>

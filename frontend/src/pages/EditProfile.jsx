@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../utils/userSilce";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import useLoader from "../hooks/useLoader";
 
 function EditProfile() {
@@ -18,6 +18,7 @@ function EditProfile() {
   } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isLoading, startLoading, stopLoading] = useLoader();
 
   const [userData, setUserData] = useState({
@@ -92,23 +93,25 @@ function EditProfile() {
           <div className="">
             <h2 className="text-2xl font-semibold my-2">Photo</h2>
             <div className="flex items-center flex-col gap-3">
-              <label htmlFor="image" className=" ">
-                {userData?.profilePic ? (
-                  <img
-                    src={
-                      typeof userData?.profilePic == "string"
-                        ? userData?.profilePic
-                        : URL.createObjectURL(userData?.profilePic)
-                    }
-                    alt=""
-                    className="aspect-square w-[150px] h-[150px] object-cover border rounded-full"
-                  />
-                ) : (
-                  <div className=" w-[150px] h-[150px] bg-white border-2 border-dashed rounded-full aspect-square  flex justify-center items-center text-xl">
-                    Select Image
-                  </div>
-                )}
-              </label>
+              <div className="w-[150px] h-[150px] cursor-pointer aspect-square rounded-full overflow-hidden">
+                <label htmlFor="image" className=" ">
+                  {userData?.profilePic ? (
+                    <img
+                      src={
+                        typeof userData?.profilePic == "string"
+                          ? userData?.profilePic
+                          : URL.createObjectURL(userData?.profilePic)
+                      }
+                      alt=""
+                      className="rounded-full w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className=" w-[150px] h-[150px] bg-white border-2 border-dashed rounded-full aspect-square  flex justify-center items-center text-xl">
+                      Select Image
+                    </div>
+                  )}
+                </label>
+              </div>
               <h2
                 className="text-lg text-red-500 font-medium cursor-pointer"
                 onClick={() => {
@@ -167,15 +170,23 @@ function EditProfile() {
           </div>
 
           {!isLoading ? (
-            <button
-              disabled={isButtonDisabled}
-              className={` px-7 py-3 rounded-full text-white my-3  ${
-                isButtonDisabled ? " bg-green-300 " : " bg-green-600 "
-              } `}
-              onClick={handleUpdateProfile}
-            >
-              Update
-            </button>
+            <div>
+              <button
+                disabled={isButtonDisabled}
+                className={` px-7 py-3 rounded-full text-white my-3  ${
+                  isButtonDisabled ? " bg-green-300 " : " bg-green-600 "
+                } `}
+                onClick={handleUpdateProfile}
+              >
+                Update
+              </button>
+              <button
+                className={` mx-4 px-7 py-3 rounded-full text-white my-3 bg-black`}
+                onClick={() => navigate(-1)}
+              >
+                Back
+              </button>
+            </div>
           ) : (
             <span className="loader"></span>
           )}

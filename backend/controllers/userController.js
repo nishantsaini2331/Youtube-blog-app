@@ -397,7 +397,14 @@ async function getUserById(req, res) {
       .populate("blogs following likeBlogs saveBlogs")
       .populate({
         path: "followers following",
-        select: "name username",
+        select: "name username profilePic",
+      })
+      .populate({
+        path: "blogs likeBlogs saveBlogs",
+        populate: {
+          path: "creator",
+          select: "name username profilePic",
+        },
       })
       .select("-password -isVerify -__v -email -googleAuth");
 

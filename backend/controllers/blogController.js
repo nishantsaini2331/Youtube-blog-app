@@ -435,7 +435,11 @@ async function searchBlogs(req, res) {
     const blogs = await Blog.find(query, { draft: false })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .populate({
+        path: "creator",
+        select: "name email followers username profilePic",
+      });
     if (blogs.length === 0) {
       return res.status(400).json({
         success: false,

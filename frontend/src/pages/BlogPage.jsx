@@ -142,7 +142,7 @@ function BlogPage() {
           <div className="flex items-center my-5 gap-3">
             <Link to={`/@${blogData.creator.username}`}>
               <div>
-                <div className="w-10 h-10 cursor-pointer">
+                <div className="w-10 h-10 cursor-pointer aspect-square rounded-full overflow-hidden">
                   <img
                     src={
                       blogData?.creator?.profilePic
@@ -150,7 +150,7 @@ function BlogPage() {
                         : `https://api.dicebear.com/9.x/initials/svg?seed=${blogData.creator.name}`
                     }
                     alt=""
-                    className="rounded-full w-full h-full object-contain"
+                    className="rounded-full w-full h-full object-cover"
                   />
                 </div>
               </div>

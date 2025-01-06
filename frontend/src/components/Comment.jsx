@@ -238,7 +238,7 @@ function DisplayComments({
                     className="flex gap-2"
                   >
                     <div className="flex gap-2">
-                      <div className="w-10 h-10">
+                      <div className="w-10 h-10 aspect-square rounded-full overflow-hidden">
                         <img
                           //   src={`https://api.dicebear.com/9.x/initials/svg?seed=${comment.user.name}`}
                           src={
@@ -247,7 +247,7 @@ function DisplayComments({
                               : `https://api.dicebear.com/9.x/initials/svg?seed=${comment?.user?.name}`
                           }
                           alt=""
-                          className="rounded-full"
+                          className="rounded-full w-full h-full object-cover"
                         />
                       </div>
                       <div>

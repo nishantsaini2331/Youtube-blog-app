@@ -142,11 +142,15 @@ function ProfilePage() {
 
           <div className=" max-lg:w-full w-[20%]   lg:border-l max-lg:flex lg:pl-10 lg:min-h-[calc(100vh_-_70px)] ">
             <div className="my-10">
-              <div className="w-20 h-20">
+              <div className="w-20 h-20 aspect-square rounded-full overflow-hidden">
                 <img
-                  src={`https://api.dicebear.com/9.x/initials/svg?seed=${userData.name}`}
-                  alt=""
-                  className="rounded-full"
+                  src={
+                    userData.profilePic
+                      ? userData.profilePic
+                      : `https://api.dicebear.com/9.x/initials/svg?seed=${userData.name}`
+                  }
+                  alt={userData.name}
+                  className="rounded-full w-full h-full object-cover"
                 />
               </div>
               <p className="text-base max-md:text-lg font-medium my-3">
@@ -182,11 +186,15 @@ function ProfilePage() {
                       <div className="flex justify-between items-center">
                         <Link to={`/@${user.username}`}>
                           <div className="flex gap-2 items-center hover:underline cursor-pointer">
-                            <div className="w-4 h-4">
+                            <div className="w-4 h-4 aspect-square rounded-full overflow-hidden">
                               <img
-                                src={`https://api.dicebear.com/9.x/initials/svg?seed=${user.name}`}
+                                src={
+                                  user?.profilePic
+                                    ? user?.profilePic
+                                    : `https://api.dicebear.com/9.x/initials/svg?seed=${user.name}`
+                                }
                                 alt=""
-                                className="rounded-full"
+                                className="rounded-full w-full h-full object-cover"
                               />
                             </div>
                             <p className="text-base font-medium my-3">

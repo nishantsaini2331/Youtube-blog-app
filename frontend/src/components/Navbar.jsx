@@ -84,7 +84,7 @@ function Navbar() {
           {token ? (
             // <div className="text-xl capitalize">{name}</div>
             <div
-              className="w-10 h-10 cursor-pointer"
+              className="w-10 h-10 cursor-pointer aspect-square rounded-full overflow-hidden"
               onClick={() => setShowPopup((prev) => !prev)}
             >
               <img
@@ -94,7 +94,7 @@ function Navbar() {
                     : `https://api.dicebear.com/9.x/initials/svg?seed=${name}`
                 }
                 alt=""
-                className="rounded-full w-full h-full object-contain"
+                className="rounded-full w-full h-full object-cover"
               />
             </div>
           ) : (
